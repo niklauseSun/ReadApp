@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { Fragment } from "react";
+import React, { Component } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -17,29 +17,29 @@ import {
 } from "react-native";
 
 import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions
+  Colors
 } from "react-native/Libraries/NewAppScreen";
 
-const Books = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}
-        >
-          <Header />
-          <Text>Books</Text>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+import { Header } from "../components"
+class Books extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  render() {
+    return (
+      <View>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView>
+          <Header title={"书库"} />
+          
+        </SafeAreaView>
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   scrollView: {

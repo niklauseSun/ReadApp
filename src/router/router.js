@@ -5,9 +5,24 @@ import Home from '../layouts/Home'
 import Books from '../layouts/Books'
 
 const TabNavigator = createBottomTabNavigator({
-  Home: Home,
-  Books: Books,
-  Settings: My
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      tabBarLabel: '我的书架',
+    }
+  },
+  Books: {
+    screen: Books,
+    navigationOptions: {
+      tabBarLabel: '书库',
+    }
+  },
+  Settings: {
+    screen: My,
+    navigationOptions: {
+      tabBarLabel: '个人中心',
+    }
+  }
 });
 
 export default createAppContainer(TabNavigator);

@@ -6,40 +6,40 @@
  * @flow
  */
 
-import React, { Fragment } from "react";
+import React, { Component } from "react";
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
   StatusBar
 } from "react-native";
 
 import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions
+  Colors
 } from "react-native/Libraries/NewAppScreen";
 
-const My = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}
-        >
-          <Header />
-          <Text>My</Text>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+import { Header } from "../components"
+
+class My extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  render() {
+    return (
+      <View>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView>
+          <Header title={"个人中心"} />
+          <Text>my</Text>
+        </SafeAreaView>
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   scrollView: {

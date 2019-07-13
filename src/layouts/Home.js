@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { Fragment } from "react";
+import React, { Component } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -17,29 +17,36 @@ import {
 } from "react-native";
 
 import {
-  Header,
   LearnMoreLinks,
   Colors,
   DebugInstructions,
   ReloadInstructions
 } from "react-native/Libraries/NewAppScreen";
 
-const Home = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}
-        >
+import { Header } from "../components"
+
+// import SearchBar from '@ant-design/react-native/lib/search-bar';
+
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  render() {
+    return (
+      <View>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView>
           <Header />
+          {/* <SearchBar /> */}
           <Text>home</Text>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+        </SafeAreaView>
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   scrollView: {
