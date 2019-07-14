@@ -23,9 +23,7 @@ import {
   ReloadInstructions
 } from "react-native/Libraries/NewAppScreen";
 
-import { Header } from "../components"
-
-// import SearchBar from '@ant-design/react-native/lib/search-bar';
+import { Header, SearchBar } from "../components"
 
 class Home extends Component {
   constructor(props) {
@@ -36,12 +34,14 @@ class Home extends Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
-        <SafeAreaView>
+        <SafeAreaView style={styles.safeView}>
           <Header />
-          {/* <SearchBar /> */}
-          <Text>home</Text>
+          <View style={styles.container}>
+            <SearchBar />
+            {/* <Text>home</Text> */}
+          </View>
         </SafeAreaView>
       </View>
     );
@@ -49,30 +49,19 @@ class Home extends Component {
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter
+  container: {
+    flex: 1,
+    backgroundColor: '#F6F7FB'
   },
-  body: {
-    backgroundColor: Colors.white
+  safeView: {
+    flex: 1
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: Colors.black
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: "400",
-    color: Colors.dark
-  },
-  highlight: {
-    fontWeight: "700"
+  content: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#F6F7FB'
   }
+
 });
 
 export default Home;

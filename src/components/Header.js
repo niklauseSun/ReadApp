@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-// import { Px } from '../utils'
+import { px } from '../utils'
 
 export default class Header extends Component {
 
@@ -29,6 +29,6 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   titleStyle: {
-    fontSize: 16
+    fontSize: px(32)
   }
 });
