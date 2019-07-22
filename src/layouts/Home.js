@@ -13,17 +13,31 @@ import {
   ScrollView,
   View,
   Text,
-  StatusBar
+  StatusBar,
+  FlatList
 } from "react-native";
 
-import {
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions
-} from "react-native/Libraries/NewAppScreen";
+import { Header, SearchBar, BookItem } from "../components"
+import { px } from '../utils';
 
-import { Header, SearchBar } from "../components"
+let bookList = [
+  {
+    name: 'test1',
+    subTitle: 'test1'
+  },
+  {
+    name: 'test2',
+    subTitle: 'test1'
+  },
+  {
+    name: 'test3',
+    subTitle: 'test1'
+  },
+  {
+    name: 'test4',
+    subTitle: 'test4'
+  },
+]
 
 class Home extends Component {
   constructor(props) {
@@ -41,6 +55,16 @@ class Home extends Component {
           <View style={styles.container}>
             <SearchBar />
             {/* <Text>home</Text> */}
+            <FlatList
+              style={{
+                marginTop: px(42)
+              }}
+              data={bookList}
+              renderItem={({ item, index }) => {
+                return <BookItem item={item} />
+              }}
+              numColumns={3}
+            />
           </View>
         </SafeAreaView>
       </View>

@@ -1,0 +1,60 @@
+import React, { Component } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { px } from '../utils';
+
+export default class RankHeadItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  render() {
+    const { name = "白发皇妃", author = "李香兰", info = "容乐从昏迷中醒来，记忆全失，种种迹象 令她对自己的身份产生怀疑…"} = this.props
+    return (
+      <View style={styles.container}>
+        <View style={styles.image}>
+          <Text>test</Text>
+        </View>
+        <View style={styles.detail}>
+          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.author}>{author}</Text>
+          <Text style={styles.info}>{info}</Text>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    height: px(169),
+    paddingLeft: px(30),
+    paddingRight: px(30),
+    flexDirection: 'row',
+    width: '100%'
+  },
+  image: {
+    width: px(113),
+    backgroundColor: 'red',
+    marginRight: px(42)
+  },
+  detail: {
+    flex: 1
+  },
+  name: {
+    fontSize: px(34),
+    color: '#333333',
+    marginTop: px(8)
+  },
+  author: {
+    fontSize: px(28),
+    color: '#999999',
+    marginTop: px(8)
+  },
+  info: {
+    fontSize: px(28),
+    color: '#999999',
+    marginTop: px(8)
+  }
+})
