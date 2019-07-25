@@ -17,21 +17,27 @@ import {
   TouchableOpacity
 } from "react-native";
 
-import {
-  Colors
-} from "react-native/Libraries/NewAppScreen";
-
 import { Header, SearchBar, RankHeadItem, RankItem, AddBookItem } from "../components"
 import { px } from "../utils";
+import { getMainRanks, getSubRanks } from "../requests";
 
 class Books extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      mainRankData: null,
+      subRankData: null
     };
   }
 
+  componentDidMount() {
+    this.getMainRankAction()
+    this.getSubRankAction()
+  }
+
   render() {
+    const { mainRankData, subRankData } = this.state;
+    console.log("mainRankData", mainRankData, subRankData);
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -42,15 +48,26 @@ class Books extends Component {
             <ScrollView style={styles.content}>
               <View style={styles.rank}>
                 <Text style={styles.booksHeadText}>主排行</Text>
-                <RankHeadItem />
+
+                <RankHeadItem
+                  item={mainRankData == null ? {} : mainRankData[0]}
+                />
                 <View style={styles.rankListView}>
                   <View style={styles.rankItems}>
-                    <RankItem/>
-                    <RankItem/>
+                    <RankItem
+                      item={mainRankData == null ? {} : mainRankData[1]}
+                    />
+                    <RankItem
+                      item={mainRankData == null ? {} : mainRankData[2]}
+                    />
                   </View>
                   <View style={styles.rankItems}>
-                    <RankItem/>
-                    <RankItem/>
+                    <RankItem
+                      item={mainRankData == null ? {} : mainRankData[3]}
+                    />
+                    <RankItem
+                      item={mainRankData == null ? {} : mainRankData[4]}
+                    />
                   </View>
                 </View>
                 <TouchableOpacity style={styles.rankListChangeButton}>
@@ -60,9 +77,15 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>仙侠</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem />
-                  <AddBookItem />
-                  <AddBookItem />
+                  <AddBookItem
+                    item={subRankData == null ? {} : subRankData[0]}
+                  />
+                  <AddBookItem
+                    item={subRankData == null ? {} : subRankData[0]}
+                  />
+                  <AddBookItem
+                    item={subRankData == null ? {} : subRankData[0]}
+                  />
                 </View>
                 <TouchableOpacity style={styles.rankListChangeButton}>
                   <Text style={styles.rankListBtnText}>查看完整榜</Text>
@@ -73,6 +96,41 @@ class Books extends Component {
         </SafeAreaView>
       </View>
     );
+  }
+
+  // private method
+  getMainRankAction() {
+    const data = {
+      callback: this.getMainRankCallback.bind(this)
+    };
+    getMainRanks(data);
+  }
+
+  getSubRankAction() {
+    const data = {
+      callback: this.getSubRankCallback.bind(this),
+      type: 1
+    };
+    getSubRanks(data);
+  }
+
+  getMainRankCallback(res) {
+    console.log(res);
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        mainRankData: data
+      });
+    }
+  }
+
+  getSubRankCallback(res) {
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        subRankData: data
+      })
+    }
   }
 }
 

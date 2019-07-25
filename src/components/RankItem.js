@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { px } from '../utils';
 
 export default class RankItem extends Component {
@@ -10,17 +10,18 @@ export default class RankItem extends Component {
   }
 
   render() {
-    const { name = "白发王妃", author = "lisa" } = this.props
+    const { name = "白发王妃", author = "lisa", image } = this.props.item || {}
     return (
-      <View style={styles.container}>
-        <View style={styles.image}>
-          <Text>test</Text>
-        </View>
+      <TouchableOpacity activeOpacity={0.7} style={styles.container}>
+        {/* <View style={styles.image}> */}
+        {/* <Text>test</Text> */}
+        <Image style={styles.image} source={{ uri: image }} />
+        {/* </View> */}
         <View style={styles.detail}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.author}>{author}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }

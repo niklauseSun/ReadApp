@@ -42,8 +42,7 @@ let bookList = [
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
@@ -61,7 +60,7 @@ class Home extends Component {
               }}
               data={bookList}
               renderItem={({ item, index }) => {
-                return <BookItem item={item} />
+                return <BookItem item={item} />;
               }}
               numColumns={3}
             />

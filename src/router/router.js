@@ -1,28 +1,48 @@
-import { createBottomTabNavigator, createAppContainer } from "react-navigation";
+import {
+  createBottomTabNavigator,
+  createAppContainer,
+  createStackNavigator
+} from "react-navigation";
 
 import My from '../layouts/My'
 import Home from '../layouts/Home'
 import Books from '../layouts/Books'
+import BookDetail from '../layouts/BookDetail'
 
-const TabNavigator = createBottomTabNavigator({
+const HomeStack = createStackNavigator({
   Home: {
-    screen: Home,
-    navigationOptions: {
-      tabBarLabel: '我的书架',
-    }
-  },
+    screen: Home
+  }
+})
+
+const BookStack = createStackNavigator({
   Books: {
     screen: Books,
-    navigationOptions: {
-      tabBarLabel: '书库',
-    }
   },
-  Settings: {
-    screen: My,
-    navigationOptions: {
-      tabBarLabel: '个人中心',
-    }
+  BookDetail: {
+    screen: BookDetail
   }
+})
+
+const SetStack = createStackNavigator({
+  Settings: {
+    screen: My
+  }
+})
+
+
+
+const TabNavigator = createBottomTabNavigator({
+  Home: HomeStack,
+  Books: BookStack,
+  Settings:SetStack
 });
+
+// const nav = createStackNavigator({
+//   TabNav : TabNavigator,
+//   BookDetail: {
+//     screen: BookDetail
+//   }
+// })
 
 export default createAppContainer(TabNavigator);

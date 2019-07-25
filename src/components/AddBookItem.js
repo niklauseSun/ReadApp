@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { px } from '../utils';
 
 export default class AddBookItem extends Component {
@@ -11,19 +11,24 @@ export default class AddBookItem extends Component {
 
   render() {
 
-    const { name = "天极", info = "不远处的中年妇女身影轻轻一动， 那惊人的速度又再次展现出来…" } = this.props
+    const {
+      articlename = "天极",
+      intro = "不远处的中年妇女身影轻轻一动， 那惊人的速度又再次展现出来…",
+      image
+    } = this.props.item || {};
 
     return (
       <View style={styles.container}>
-        <View style={styles.image}>
+        {/* <View style={styles.image}>
           <Text>test</Text>
-        </View>
-        <View style={styles.tagView}>
-
-        </View>
+        </View> */}
+        <Image style={styles.image} source={{ uri: image }} />
+        <View style={styles.tagView} />
         <View style={styles.detail}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.info}>{info}</Text>
+          <Text style={styles.name}>{articlename}</Text>
+          <Text style={styles.info} numberOfLines={2}>
+            {intro}
+          </Text>
           <View style={styles.addButtonView}>
             <TouchableOpacity style={styles.addButton}>
               <Text style={styles.addButtonText}>加入书架</Text>

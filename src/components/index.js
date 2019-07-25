@@ -7,6 +7,7 @@ import BookItem from './BookItem'
 import RankHeadItem from './RankHeadItem'
 import RankItem from './RankItem'
 import AddBookItem from './AddBookItem'
+import Hud from './Hud'
 
 export { 
   Header, 
@@ -17,5 +18,6 @@ export {
   BookItem,
   RankHeadItem,
   RankItem,
-  AddBookItem
+  AddBookItem,
+  Hud
 }
