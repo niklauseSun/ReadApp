@@ -10,15 +10,22 @@ export default class RankItem extends Component {
   }
 
   render() {
-    const { name = "白发王妃", author = "lisa", image } = this.props.item || {}
+    const { articlename = "白发王妃", author = "lisa", image } =
+      this.props.item || {};
     return (
-      <TouchableOpacity onPress={this.goToNext.bind(this)} activeOpacity={0.7} style={styles.container}>
+      <TouchableOpacity
+        onPress={this.goToNext.bind(this)}
+        activeOpacity={0.7}
+        style={styles.container}
+      >
         {/* <View style={styles.image}> */}
         {/* <Text>test</Text> */}
         <Image style={styles.image} source={{ uri: image }} />
         {/* </View> */}
         <View style={styles.detail}>
-          <Text style={styles.name}>{name}</Text>
+          <Text numberOfLines={1} style={styles.name}>
+            {articlename}
+          </Text>
           <Text style={styles.author}>{author}</Text>
         </View>
       </TouchableOpacity>
@@ -27,7 +34,10 @@ export default class RankItem extends Component {
 
   goToNext() {
     console.log('rankItem', this.props)
-    this.props.navigation.navigate("BookDetail")
+    const { articleid } = this.props.item || {};
+    this.props.navigation.navigate("BookDetail", {
+      articleid: articleid
+    });
   }
 }
 
@@ -44,7 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red'
   },
   detail: {
-
+    flex: 1
   },
   name: {
     fontSize: px(34),

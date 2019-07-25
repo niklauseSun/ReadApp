@@ -8,6 +8,7 @@ import My from '../layouts/My'
 import Home from '../layouts/Home'
 import Books from '../layouts/Books'
 import BookDetail from '../layouts/BookDetail'
+import MenuList from '../layouts/MenuList'
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -27,6 +28,13 @@ const BookStack = createStackNavigator({
   },
   BookDetail: {
     screen: BookDetail,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  MenuList: {
+    screen: MenuList,
     navigationOptions: {
       header: null,
       tabBarVisible: false

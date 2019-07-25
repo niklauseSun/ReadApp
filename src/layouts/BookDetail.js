@@ -1,65 +1,145 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity, Image } from "react-native";
 import { px } from '../utils'
-import { Header } from '../components';
+import { Header, Hud } from '../components';
+import { getBookDetail } from '../requests'
+import HTML from "react-native-render-html";
+
 export default class BookDetail extends Component {
 
-    render() {
-        return (
-          <View style={styles.container}>
-            <StatusBar barStyle="dark-content" />
-            <SafeAreaView style={styles.safeView}>
-              <Header
-                showBackButton={true}
-                title="test"
-                navigation={this.props.navigation}
-              />
-              <View style={styles.content}>
-                <ScrollView>
-                  <View style={styles.headView}>
-                    <View style={styles.image}>
-                      <Text>test</Text>
-                    </View>
-                    <View style={styles.headInfo}>
-                      <Text style={styles.name}>name</Text>
-                      <Text style={styles.author}>author</Text>
-                      <Text style={styles.textNum}>共多少字</Text>
-                    </View>
-                  </View>
-                  <View style={styles.info}>
-                    <Text style={styles.infoText}>
-                      西启公主，为结盟北临奉命嫁给北临王子无忧，却被无忧拒婚。后来为解开自己的身世秘密，容乐化名茶楼掌柜漫夭，过程中她和无忧不打不相西启公主，为结盟北临奉命嫁给北临王子无忧，却被无忧拒婚。后来为解开自己的身世秘密，容乐化名茶楼掌…
-                    </Text>
-                  </View>
-                  <View style={styles.menu}>
-                    <Text style={styles.menuText}>目录</Text>
-                    <Text style={styles.menuInfoText}>共多少张</Text>
-                    <View style={styles.menuIcon}>
-                      <Text>目录图标</Text>
-                    </View>
-                  </View>
-                </ScrollView>
-                <View style={styles.bottomView}>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.addButton}
-                  >
-                    <View style={styles.addButtonView}>
-                      <Text style={styles.addText}>加入书架</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.readButton}
-                  >
-                    <Text style={styles.readText}>免费试读</Text>
-                  </TouchableOpacity>
+  constructor(props) {
+    super(props);
+    console.log("constructor", props)
+    const { articleid } = props.navigation.state.params || {};
+    this.state = {
+      articleid: articleid,
+      bookDetail: null
+    };
+  }
+
+  componentDidMount() {
+    this.requestBookDetail()
+  }
+
+  render() {
+    const { bookDetail } = this.state;
+
+    if (bookDetail == null) {
+      return null;
+    }
+
+    const {
+      articlename,
+      author,
+      image,
+      intro,
+      chapters,
+      size
+    } = bookDetail
+
+    const htmlStr = `<div style="white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;">${intro}</div>`;
+
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView style={styles.safeView}>
+          <Header
+            showBackButton={true}
+            title=""
+            navigation={this.props.navigation}
+          />
+          <View style={styles.content}>
+            <ScrollView>
+              <View style={styles.headView}>
+                {/* <View style={styles.image}>
+                  <Text>test</Text>
+                </View> */}
+                <Image source={{ uri: image }} style={styles.image} />
+                <View style={styles.headInfo}>
+                  <Text style={styles.name}>{articlename}</Text>
+                  <Text style={styles.author}>{author}</Text>
+                  <Text style={styles.textNum}>共{size}字</Text>
                 </View>
               </View>
-            </SafeAreaView>
+              <View style={styles.info}>
+                <Text numberOfLines={5} style={styles.infoText}>
+                  {intro}
+                </Text>
+                {/* <HTML
+                  baseFontStyle={{
+                    lineHeight: px(52),
+                    fontSize: px(32),
+                  }}
+                  // numberOfLines={5}
+                  // conta={styles.infoText}
+                  html={htmlStr}
+                /> */}
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={this.goToMenuList.bind(this)}
+                style={styles.menu}
+              >
+                <Text style={styles.menuText}>目录</Text>
+                <Text style={styles.menuInfoText}>共{chapters}章</Text>
+                <View style={styles.menuIcon}>
+                  <Text>目录图标</Text>
+                </View>
+              </TouchableOpacity>
+            </ScrollView>
+            <View style={styles.bottomView}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.addButton}
+              >
+                <View style={styles.addButtonView}>
+                  <Text style={styles.addText}>加入书架</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.readButton}
+              >
+                <Text style={styles.readText}>免费试读</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        );
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  // method 
+  goToMenuList() {
+    console.log('gotomenulist')
+    const { articleid } = this.state.bookDetail
+    this.props.navigation.navigate("MenuList", { articleid: articleid });
+    // getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null})
+  }
+
+  // request
+  requestBookDetail() {
+    const data = {
+      articleid: this.state.articleid,
+      callback: this.bookDetailCallback.bind(this)
     }
+    getBookDetail(data);
+    Hud.show();
+  }
+
+  // callback
+  bookDetailCallback(res) {
+    console.log('bookDetail', res)
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        bookDetail: data
+      });
+      Hud.hidden()
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -108,13 +188,34 @@ const styles = StyleSheet.create({
     marginTop: px(20),
     backgroundColor: "#FFFFFF",
     paddingHorizontal: px(30),
-    paddingVertical: px(30)
+    paddingVertical: px(30),
+    height: px(326)
   },
   infoText: {
-    fontSize: px(28),
-    color: "#656E79",
+    fontSize: px(32),
     lineHeight: px(52),
-    // height: px(260),
+  },
+  menu: {
+    height: px(140),
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    marginTop: px(20),
+    alignItems: "center",
+    marginBottom: px(20)
+  },
+  menuText: {
+    marginLeft: px(30),
+    marginRight: px(30),
+    color: "#656E79",
+    fontSize: px(32)
+  },
+  menuInfoText: {
+    flex: 1,
+    color: "#656E79",
+    fontSize: px(32)
+  },
+  menuIcon: {
+    marginRight: px(30)
   },
   bottomView: {
     height: px(153),

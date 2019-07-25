@@ -10,17 +10,35 @@ export default class RankHeadItem extends Component {
   }
 
   render() {
-    const { name = "白发皇妃", author = "李香兰", info = "容乐从昏迷中醒来，记忆全失，种种迹象 令她对自己的身份产生怀疑…" ,image } = this.props.item || {}
+    const {
+      articlename = "白发皇妃",
+      author = "李香兰",
+      info = "容乐从昏迷中醒来，记忆全失，种种迹象 令她对自己的身份产生怀疑…",
+      image
+    } = this.props.item || {};
     return (
-      <TouchableOpacity activeOpacity={0.7} style={styles.container}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={this.gotoBookDetail.bind(this)}
+        style={styles.container}
+      >
         <Image style={styles.image} source={{ uri: image }} />
         <View style={styles.detail}>
-          <Text style={styles.name}>{name}</Text>
+          <Text style={styles.name}>{articlename}</Text>
           <Text style={styles.author}>{author}</Text>
           <Text style={styles.info}>{info}</Text>
         </View>
       </TouchableOpacity>
     );
+  }
+
+  gotoBookDetail() {
+    if (this.props.navigation) {
+      const { articleid } = this.props.item || {}
+      this.props.navigation.navigate("BookDetail", {
+        articleid: articleid
+      });
+    }
   }
 }
 
