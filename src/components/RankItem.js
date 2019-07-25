@@ -12,7 +12,7 @@ export default class RankItem extends Component {
   render() {
     const { name = "白发王妃", author = "lisa", image } = this.props.item || {}
     return (
-      <TouchableOpacity activeOpacity={0.7} style={styles.container}>
+      <TouchableOpacity onPress={this.goToNext.bind(this)} activeOpacity={0.7} style={styles.container}>
         {/* <View style={styles.image}> */}
         {/* <Text>test</Text> */}
         <Image style={styles.image} source={{ uri: image }} />
@@ -23,6 +23,11 @@ export default class RankItem extends Component {
         </View>
       </TouchableOpacity>
     );
+  }
+
+  goToNext() {
+    console.log('rankItem', this.props)
+    this.props.navigation.navigate("BookDetail")
   }
 }
 

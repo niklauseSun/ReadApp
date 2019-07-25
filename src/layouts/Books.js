@@ -56,17 +56,21 @@ class Books extends Component {
                   <View style={styles.rankItems}>
                     <RankItem
                       item={mainRankData == null ? {} : mainRankData[1]}
+                      navigation={this.props.navigation}
                     />
                     <RankItem
                       item={mainRankData == null ? {} : mainRankData[2]}
+                      navigation={this.props.navigation}
                     />
                   </View>
                   <View style={styles.rankItems}>
                     <RankItem
                       item={mainRankData == null ? {} : mainRankData[3]}
+                      navigation={this.props.navigation}
                     />
                     <RankItem
                       item={mainRankData == null ? {} : mainRankData[4]}
+                      navigation={this.props.navigation}
                     />
                   </View>
                 </View>

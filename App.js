@@ -26,6 +26,9 @@ import {
 
 import TabNav from './src/router/router'
 
+console.disableYellowBox = true // 关闭全部黄色警告
+
+
 const App = () => {
   return (
     <TabNav />

@@ -11,31 +11,89 @@ import BookDetail from '../layouts/BookDetail'
 
 const HomeStack = createStackNavigator({
   Home: {
-    screen: Home
+    screen: Home,
+    navigationOptions: {
+      header: null
+    }
   }
-})
+});
 
 const BookStack = createStackNavigator({
   Books: {
     screen: Books,
+    navigationOptions: {
+      header: null
+    }
   },
   BookDetail: {
-    screen: BookDetail
+    screen: BookDetail,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
   }
-})
+});
 
 const SetStack = createStackNavigator({
   Settings: {
-    screen: My
+    screen: My,
+    navigationOptions: {
+      header: null
+    }
   }
 })
+
+BookStack.navigationOptions = ({ navigation }) => {
+  let tabBarVisible = true;
+  if (navigation.state.index > 0) {
+    tabBarVisible = false;
+  }
+  return {
+    tabBarVisible
+  };
+}
+
+HomeStack.navigationOptions = ({ navigation }) => {
+  let tabBarVisible = true;
+  if (navigation.state.index > 0) {
+    tabBarVisible = false;
+  }
+  return {
+    tabBarVisible
+  };
+};
+
+SetStack.navigationOptions = ({ navigation }) => {
+  let tabBarVisible = true;
+  if (navigation.state.index > 0) {
+    tabBarVisible = false;
+  }
+  return {
+    tabBarVisible
+  };
+};
 
 
 
 const TabNavigator = createBottomTabNavigator({
-  Home: HomeStack,
-  Books: BookStack,
-  Settings:SetStack
+  Home: {
+    screen: HomeStack,
+    navigationOptions: {
+      header: null
+    }
+  },
+  Books: {
+    screen: BookStack,
+    navigationOptions: {
+      header: null
+    }
+  },
+  Settings: {
+    screen: SetStack,
+    navigationOptions: {
+      header: null
+    }
+  }
 });
 
 // const nav = createStackNavigator({
