@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import { Text, View, StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity, Image } from "react-native";
 import { px } from '../utils'
 import { Header, Hud } from '../components';
-import { getBookDetail } from '../requests'
-import HTML from "react-native-render-html";
+import { getBookDetail, saveBookIdList, saveBookDetailList } from "../requests";
+import { Toast } from "@ant-design/react-native";
 
 export default class BookDetail extends Component {
 
@@ -93,6 +93,7 @@ export default class BookDetail extends Component {
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.addButton}
+                onPress={this.addBookAction.bind(this)}
               >
                 <View style={styles.addButtonView}>
                   <Text style={styles.addText}>加入书架</Text>
@@ -101,6 +102,7 @@ export default class BookDetail extends Component {
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.readButton}
+                onPress={this.goToBookContent.bind(this)}
               >
                 <Text style={styles.readText}>免费试读</Text>
               </TouchableOpacity>
@@ -118,6 +120,35 @@ export default class BookDetail extends Component {
     this.props.navigation.navigate("MenuList", { articleid: articleid });
     // getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null})
   }
+
+  goToBookContent() {
+    console.log("goto book content")
+    const { articleid } = this.state.bookDetail
+    this.props.navigation.navigate("BookContent")
+  }
+
+  addBookAction() {
+    const { articleid } = this.state.bookDetail;
+    const data = {
+      charterIndex: 0,
+      ...this.state.bookDetail
+    }
+
+    if (global.bookIdList.indexOf(articleid) == -1) {
+      console.log("数据中没有这个数据")
+
+      global.bookIdList.push(articleid);
+      global.bookDetailList.unshift(data);
+
+      console.log('dddd', global.bookDetailList, global.bookIdList)
+      saveBookIdList({data: global.bookIdList })
+      saveBookDetailList({data: global.bookDetailList })
+    } else {
+      
+    }
+
+  }
+
 
   // request
   requestBookDetail() {

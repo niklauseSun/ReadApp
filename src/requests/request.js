@@ -12,13 +12,13 @@ const getMainRanks = ({callback = null}) => {
 }
 
 // 书库分类排行榜
-const getSubRanks = ({type, callback = null}) => {
-  getRequest(`Api/Article/TypeRanks/${type}`, callback);
+const getSubRanks = ({type, pageSize = 3, callback = null}) => {
+  getRequest(`Api/Article/TypeRanks/${type}?pageSize=${pageSize}`, callback);
 }
 
 // 搜索接口
-const getSearchResult = ({keyword, pageSize = 3, callback = null}) => {
-  getRequest(`Api/Article/Search/${keyword}?pageSize=${pageSize}`, callback);
+const getSearchResult = ({keyword, callback = null}) => {
+  getRequest(`Api/Article/Search/${keyword}`, callback);
 }
 
 const getBookDetail = ({articleid, callback = null}) => {

@@ -76,11 +76,13 @@ export class MenuList extends Component {
 
     // render
     renderItem = ({ item }) => {
-        return (
-            <TouchableOpacity style={styles.itemContent}>
-            <Text style={styles.chapterName}>{item.chaptername}</Text>
-            </TouchableOpacity>
-        );
+      return (
+        <TouchableOpacity onPress={() => {
+          this.props.navigation.navigate("BookContent")
+        }} style={styles.itemContent}>
+          <Text style={styles.chapterName}>{item.chaptername}</Text>
+        </TouchableOpacity>
+      );
     };
 
     // method

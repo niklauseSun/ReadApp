@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from "react-native";
 import { px } from '../utils'
 
 export default class BookItem extends Component {
@@ -10,15 +10,15 @@ export default class BookItem extends Component {
   }
 
   render() {
-    const { name = "name", subTitle = "subTitle" } = this.props.item || {}
+    console.log('bookItem', this.props.item)
+    const { articlename = "name", charterIndex, chapters, image } =
+      this.props.item || {};
     return (
       <View style={styles.container}>
         <View style={styles.detail}>
-          <View style={styles.image}>
-            <Text>test</Text>
-          </View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.subTitle}>{subTitle}</Text>
+          <Image style={styles.image} source={{ uri: image }} />
+          <Text numberOfLines={1} style={styles.name}>{articlename}</Text>
+          <Text style={styles.subTitle}>还剩{chapters-charterIndex}章未读</Text>
         </View>
       </View>
     );
@@ -28,18 +28,15 @@ export default class BookItem extends Component {
 const styles = StyleSheet.create({
   container: {
     width: '33%',
-    backgroundColor:'blue',
     alignItems: 'center',
     paddingTop: px(60),
-
   },
   detail: {
-
+    paddingLeft: px(30)
   },
   image: {
     height: px(256),
     width: px(176),
-    backgroundColor: 'red',
   },
   name: {
     marginTop: px(20),

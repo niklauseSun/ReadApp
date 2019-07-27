@@ -19,33 +19,25 @@ import {
 
 import { Header, SearchBar, BookItem } from "../components"
 import { px } from '../utils';
-
-let bookList = [
-  {
-    name: 'test1',
-    subTitle: 'test1'
-  },
-  {
-    name: 'test2',
-    subTitle: 'test1'
-  },
-  {
-    name: 'test3',
-    subTitle: 'test1'
-  },
-  {
-    name: 'test4',
-    subTitle: 'test4'
-  },
-]
+import { getBookList, getBookIdList } from '../requests'
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      bookIdList: [],
+      bookDetailList: []
+    };
   }
 
+  componentDidMount() {
+    this.getAllBookDetailList()
+  }
+
+
   render() {
+    const { bookDetailList } = this.state;
+    console.log('render', bookDetailList)
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -58,7 +50,7 @@ class Home extends Component {
               style={{
                 marginTop: px(42)
               }}
-              data={bookList}
+              data={bookDetailList}
               renderItem={({ item, index }) => {
                 return <BookItem item={item} />;
               }}
@@ -69,6 +61,51 @@ class Home extends Component {
       </View>
     );
   }
+
+  // action
+  getAllBookDetailList() {
+    this.requestBookIdList();
+    this.requestBookList();
+  }
+
+  requestBookIdList() {
+    const data = {
+      callback: this.requestBookIdListCallback.bind(this)
+    }
+
+    getBookIdList(data);
+  }
+
+  requestBookList() {
+    const data = {
+      callback: this.requestBookListCallback.bind(this)
+    }
+
+    getBookList(data);
+  }
+
+  requestBookIdListCallback(res) {
+    const { error, data } = res;
+    if (error == null) {
+      global.bookIdList = data || [];
+      this.setState({
+        bookIdList: data
+      })
+    }
+  }
+
+  requestBookListCallback(res) {
+    const { error, data } = res;
+    console.log('requestbookdetail', res)
+    if (error == null) {
+      global.bookDetailList = data || [];
+      console.log("????ddd")
+      this.setState({
+        bookDetailList: data
+      });
+    }
+  }
+
 }
 
 const styles = StyleSheet.create({

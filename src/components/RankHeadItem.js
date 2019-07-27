@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
   },
   image: {
     width: px(113),
-    backgroundColor: 'red',
     marginRight: px(42)
   },
   detail: {

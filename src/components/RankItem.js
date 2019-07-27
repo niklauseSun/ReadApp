@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
     width: px(113),
     marginLeft: px(30),
     marginRight: px(42),
-    backgroundColor: 'red'
   },
   detail: {
     flex: 1

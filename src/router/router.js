@@ -9,6 +9,8 @@ import Home from '../layouts/Home'
 import Books from '../layouts/Books'
 import BookDetail from '../layouts/BookDetail'
 import MenuList from '../layouts/MenuList'
+import BookContent from '../layouts/BookContent'
+import RankList from '../layouts/RankList'
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -35,6 +37,20 @@ const BookStack = createStackNavigator({
   },
   MenuList: {
     screen: MenuList,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  BookContent: {
+    screen: BookContent,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  RankList: {
+    screen: RankList,
     navigationOptions: {
       header: null,
       tabBarVisible: false

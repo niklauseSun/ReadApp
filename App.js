@@ -23,11 +23,23 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-
+import { AsyncStorage } from "react-native";
+import Storage from "react-native-storage";
 import TabNav from './src/router/router'
+
+var storage = new Storage({
+  size: 1000,
+  storageBackend: AsyncStorage,
+  defaultExpires: null,
+  enableCache: true
+});
+// 全局变量
+global.storage = storage;
 
 console.disableYellowBox = true // 关闭全部黄色警告
 
+global.bookIdList = []
+global.bookDetailList = [];
 
 const App = () => {
   return (
