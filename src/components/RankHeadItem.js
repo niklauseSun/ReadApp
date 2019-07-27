@@ -11,9 +11,9 @@ export default class RankHeadItem extends Component {
 
   render() {
     const {
-      articlename = "白发皇妃",
-      author = "李香兰",
-      info = "容乐从昏迷中醒来，记忆全失，种种迹象 令她对自己的身份产生怀疑…",
+      articlename = "",
+      author = "",
+      info = "",
       image
     } = this.props.item || {};
     return (

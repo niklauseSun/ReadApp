@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, SafeAreaView, StatusBar } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView, StatusBar, FlatList } from "react-native";
+import { getSubRanks } from '../requests'
+import { RankHeadItem, Header } from '../components';
+import { px } from '../utils';
 
 export default class RankList extends Component {
 
@@ -10,28 +13,53 @@ export default class RankList extends Component {
     this.state = {
       rankType: rankType,
       pageIndex: 1,
-      pageSize: 10
+      pageSize: 10,
+      subData: []
     }
+  }
+
+  componentDidMount() {
+    this.getRankListAction()
   }
 
   render() {
     console.log("rankType", this.state.rankType)
+    const { subData } = this.state;
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
-          {/* <Text>排行榜</Text> */}
+        <Header title={"排行榜"} showBackButton={true} navigation={this.props.navigation}/>
+          <FlatList
+            data={subData}
+            renderItem={({item}) => <RankHeadItem navigation={this.props.navigation} item={item} />}
+            ItemSeparatorComponent={() => {
+              return <View style={{ height: px(30)}} />
+            }}
+          />
         </SafeAreaView>
       </View>
     )
   }
 
   getRankListAction() {
+    const data = {
+      callback: this.getRankListCallback.bind(this),
+      pageSize: 10,
+      type: this.state.rankType
+    }
 
+    getSubRanks(data)
   }
 
-  getRankListCallback() {
-    
+  getRankListCallback(res) {
+    console.log('getRankListCallback', res);
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        subData: data
+      })
+    }
   }
 }
 

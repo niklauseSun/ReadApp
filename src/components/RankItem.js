@@ -10,7 +10,7 @@ export default class RankItem extends Component {
   }
 
   render() {
-    const { articlename = "白发王妃", author = "lisa", image } =
+    const { articlename = "", author = "", image } =
       this.props.item || {};
     return (
       <TouchableOpacity

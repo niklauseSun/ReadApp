@@ -18,6 +18,13 @@ const HomeStack = createStackNavigator({
     navigationOptions: {
       header: null
     }
+  },
+  BookContent: {
+    screen: BookContent,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
   }
 });
 

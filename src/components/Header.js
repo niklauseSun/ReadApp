@@ -11,17 +11,23 @@ export default class Header extends Component {
   }
 
   render() {
-    const { title = "首页", showBackButton = false } = this.props
+    const { title = "首页", showBackButton = false, showRightButton = false, rightButtonText, rightButtonAction } = this.props
 
     return (
       <View style={styles.header}>
         <View style={styles.left}>
-          {
-            showBackButton? <TouchableOpacity onPress={this.goBack.bind(this)}><Text>返回</Text></TouchableOpacity>: null
-          }
+          {showBackButton ? (
+            <TouchableOpacity onPress={this.goBack.bind(this)}>
+              <Text>返回</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
         <Text style={styles.titleStyle}>{title}</Text>
-        <View style={styles.right} />
+        <View style={styles.right}>{showRightButton ? (
+          <TouchableOpacity activeOpacity={0.7} style={styles.rightButton} onPress={rightButtonAction}>
+            <Text style={styles.rightButtonText}>{rightButtonText}</Text>
+          </TouchableOpacity>
+        ): null}</View>
       </View>
     );
   }
@@ -35,11 +41,11 @@ export default class Header extends Component {
 
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
+    width: "100%",
     height: 45,
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   titleStyle: {
     fontSize: px(32)
@@ -51,5 +57,12 @@ const styles = StyleSheet.create({
   right: {
     flex: 1,
     marginRight: px(30)
+  },
+  rightButton: {
+    alignItems: 'flex-end'
+  },
+  rightButtonText: {
+    fontSize: px(30),
+    color: '#333'
   }
 });

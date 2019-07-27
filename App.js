@@ -26,6 +26,7 @@ import {
 import { AsyncStorage } from "react-native";
 import Storage from "react-native-storage";
 import TabNav from './src/router/router'
+import { Provider } from "@ant-design/react-native"
 
 var storage = new Storage({
   size: 1000,
@@ -43,8 +44,10 @@ global.bookDetailList = [];
 
 const App = () => {
   return (
-    <TabNav />
-  )
+    <Provider>
+      <TabNav />
+    </Provider>
+  );
 }
 
 // const App = () => {

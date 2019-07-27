@@ -1,5 +1,15 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity, Image } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  DeviceEventEmitter
+} from "react-native";
 import { px } from '../utils'
 import { Header, Hud } from '../components';
 import { getBookDetail, saveBookIdList, saveBookDetailList } from "../requests";
@@ -143,8 +153,10 @@ export default class BookDetail extends Component {
       console.log('dddd', global.bookDetailList, global.bookIdList)
       saveBookIdList({data: global.bookIdList })
       saveBookDetailList({data: global.bookDetailList })
+      Toast.show("添加成功！")
+      DeviceEventEmitter.emit("updateBookListEmit");
     } else {
-      
+      Toast.show("本书已添加到书库中！")
     }
 
   }
