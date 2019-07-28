@@ -78,7 +78,11 @@ class Home extends Component {
               numColumns={3}
             />
             {this.state.isLongSelect ? (
-              <TouchableOpacity style={styles.deleteButton}>
+              <TouchableOpacity
+                onPress={this.deleteAction.bind(this)}
+                activeOpacity={0.7}
+                style={styles.deleteButton}
+              >
                 <Text style={styles.deleteButtonText}>删除</Text>
               </TouchableOpacity>
             ) : null}
@@ -123,7 +127,17 @@ class Home extends Component {
   cancelDelete() {
     this.setState({
       isLongSelect: false
-    })
+    });
+  }
+
+  deleteAction() {
+    if (this.state.selectIds.length == 0) {
+      tshi.setState({
+        isLongSelect: false
+      })
+    } else {
+      
+    }
   }
 
   requestBookIdList() {
