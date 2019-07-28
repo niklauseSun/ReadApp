@@ -8,16 +8,18 @@ import RankHeadItem from './RankHeadItem'
 import RankItem from './RankItem'
 import AddBookItem from './AddBookItem'
 import Hud from './Hud'
+import SearchInputView from "./SearchInputView";
 
-export { 
-  Header, 
-  SearchBar, 
-  Line, 
-  ReadHistoryItem, 
+export {
+  Header,
+  SearchBar,
+  Line,
+  ReadHistoryItem,
   SetItem,
   BookItem,
   RankHeadItem,
   RankItem,
   AddBookItem,
-  Hud
-}
+  Hud,
+  SearchInputView
+};

@@ -3,6 +3,10 @@ import {
   createAppContainer,
   createStackNavigator
 } from "react-navigation";
+import React, { Component } from "react";
+import { Image, StyleSheet } from 'react-native'
+import { ASSET_IMAGES } from '../config'
+import { px } from "../utils";
 
 import My from '../layouts/My'
 import Home from '../layouts/Home'
@@ -11,6 +15,9 @@ import BookDetail from '../layouts/BookDetail'
 import MenuList from '../layouts/MenuList'
 import BookContent from '../layouts/BookContent'
 import RankList from '../layouts/RankList'
+import SearchView from '../layouts/SearchView'
+
+
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -21,6 +28,13 @@ const HomeStack = createStackNavigator({
   },
   BookContent: {
     screen: BookContent,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  SearchView: {
+    screen: SearchView,
     navigationOptions: {
       header: null,
       tabBarVisible: false
@@ -106,32 +120,94 @@ SetStack.navigationOptions = ({ navigation }) => {
 
 
 
-const TabNavigator = createBottomTabNavigator({
-  Home: {
-    screen: HomeStack,
-    navigationOptions: {
-      header: null
+const TabNavigator = createBottomTabNavigator(
+  {
+    Home: {
+      screen: HomeStack,
+      navigationOptions: {
+        header: null,
+        tabBarLabel: "我的书架",
+        tabBarIcon: ({ tintColor, focused }) => {
+          if (focused) {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_BOOK_SELECTED}
+              />
+            );
+          } else {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_BOOK_UN_SELECTED}
+              />
+            );
+          }
+        }
+      }
+    },
+    Books: {
+      screen: BookStack,
+      navigationOptions: {
+        header: null,
+        tabBarLabel: "书库",
+        tabBarIcon: ({ tintColor, focused }) => {
+          if (focused) {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_MY_BOOK_SELECTED}
+              />
+            );
+          } else {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_MY_BOOK_UN_SELECTED}
+              />
+            );
+          }
+        }
+      }
+    },
+    Settings: {
+      screen: SetStack,
+      navigationOptions: {
+        header: null,
+        tabBarLabel: "个人中心",
+        tabBarIcon: ({ tintColor, focused }) => {
+          if (focused) {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_PERSONAL_SELECTED}
+              />
+            );
+          } else {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_PERSONAL_SELECTED}
+              />
+            );
+          }
+        }
+      }
     }
   },
-  Books: {
-    screen: BookStack,
-    navigationOptions: {
-      header: null
-    }
-  },
-  Settings: {
-    screen: SetStack,
-    navigationOptions: {
-      header: null
+  {
+    lazy: true,
+    tabBarOptions: {
+      activeTintColor: "#4ABD76"
     }
   }
-});
+);
 
-// const nav = createStackNavigator({
-//   TabNav : TabNavigator,
-//   BookDetail: {
-//     screen: BookDetail
-//   }
-// })
+const styles = StyleSheet.create({
+  iconStyle: {
+    height: px(18),
+    width: px(18)
+  }
+})
 
 export default createAppContainer(TabNavigator);

@@ -56,7 +56,10 @@ class Home extends Component {
             rightButtonAction={this.cancelDelete.bind(this)}
           />
           <View style={styles.container}>
-            <SearchBar />
+            <SearchBar
+              onSearch={this.onSearch.bind(this)}
+              goToHistory={this.goToHistory.bind(this)}
+            />
             {/* <Text>home</Text> */}
             <FlatList
               style={{
@@ -134,10 +137,18 @@ class Home extends Component {
     if (this.state.selectIds.length == 0) {
       tshi.setState({
         isLongSelect: false
-      })
+      });
     } else {
-      
     }
+  }
+
+  onSearch() {
+    console.log("search", this.props.navigation);
+    this.props.navigation.push("SearchView");
+  }
+
+  goToHistory() {
+    console.log("goToHistory")
   }
 
   requestBookIdList() {
@@ -190,7 +201,7 @@ class Home extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F6F7FB"
+    backgroundColor: "#F6F7FB",
   },
   safeView: {
     flex: 1
