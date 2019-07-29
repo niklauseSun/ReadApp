@@ -38,7 +38,7 @@ class Books extends Component {
       fourRankData: null,
       fiveRankData: null,
       sixRankData: null,
-      bookIdList: [],
+      bookIdList: []
     };
   }
 
@@ -70,7 +70,10 @@ class Books extends Component {
         <SafeAreaView style={styles.safeView}>
           <Header title={"书库"} />
           <View style={styles.container}>
-            <SearchBar />
+            <SearchBar
+              onSearch={this.onSearch.bind(this)}
+              goToHistory={this.goToHistory.bind(this)}
+            />
             <ScrollView style={styles.content}>
               <View style={styles.rank}>
                 <Text style={styles.booksHeadText}>主排行</Text>
@@ -187,12 +190,15 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[0]}
+                    rate={0}
                   />
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[1]}
+                    rate={1}
                   />
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[2]}
+                    rate={2}
                   />
                 </View>
                 <TouchableOpacity
@@ -208,12 +214,15 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[0]}
+                    rate={0}
                   />
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[1]}
+                    rate={1}
                   />
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[2]}
+                    rate={2}
                   />
                 </View>
                 <TouchableOpacity
@@ -230,12 +239,15 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[0]}
+                    rate={0}
                   />
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[1]}
+                    rate={1}
                   />
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[2]}
+                    rate={2}
                   />
                 </View>
                 <TouchableOpacity
@@ -254,8 +266,8 @@ class Books extends Component {
 
   // private method
   goToRankList(type) {
-    console.log('gotoranklist', type)
-    this.props.navigation.navigate("RankList", { rankType: type })
+    console.log("gotoranklist", type);
+    this.props.navigation.navigate("RankList", { rankType: type });
   }
 
   getMainRankAction() {
@@ -375,6 +387,13 @@ class Books extends Component {
     }
   }
 
+  onSearch() {
+    this.props.navigation.push("SearchView")
+  }
+
+  goToHistory() {
+    // this.props.navigation.push("")
+  }
 }
 
 const styles = StyleSheet.create({

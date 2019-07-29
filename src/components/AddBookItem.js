@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { px } from '../utils';
+import { ASSET_IMAGES } from '../config'
 
 export default class AddBookItem extends Component {
   constructor(props) {
@@ -23,7 +24,7 @@ export default class AddBookItem extends Component {
           <Text>test</Text>
         </View> */}
         <Image style={styles.image} source={{ uri: image }} />
-        <View style={styles.tagView} />
+        {this.renderTagView()}
         <View style={styles.detail}>
           <Text style={styles.name}>{articlename}</Text>
           <Text style={styles.info} numberOfLines={2}>
@@ -37,6 +38,18 @@ export default class AddBookItem extends Component {
         </View>
       </View>
     );
+  }
+  
+  renderTagView() {
+    const { rate } = this.props;
+    switch(rate) {
+      case 0:
+        return <Image source={ASSET_IMAGES.ICON_RATE_ONE} />
+      case 1:
+        return <Image source={ASSET_IMAGES.ICON_RATE_TWO} />
+      case 2:
+        return <Image source={ASSET_IMAGES.ICON_RATE_THREE} />
+    }
   }
 }
 

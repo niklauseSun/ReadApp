@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { px } from '../utils'
+import { ASSET_IMAGES } from '../config';
 
 export default class Header extends Component {
 
@@ -17,8 +18,8 @@ export default class Header extends Component {
       <View style={styles.header}>
         <View style={styles.left}>
           {showBackButton ? (
-            <TouchableOpacity onPress={this.goBack.bind(this)}>
-              <Text>返回</Text>
+            <TouchableOpacity style={styles.goBack} onPress={this.goBack.bind(this)}>
+              <Image source={ASSET_IMAGES.ICON_BACK} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -64,5 +65,10 @@ const styles = StyleSheet.create({
   rightButtonText: {
     fontSize: px(30),
     color: '#333'
+  },
+  goBack: {
+    width: px(120),
+    height: px(120),
+    backgroundColor: 'red'
   }
 });

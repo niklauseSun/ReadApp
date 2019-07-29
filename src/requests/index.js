@@ -15,8 +15,11 @@ import {
   saveBookDetailList,
   saveBookIdList,
   saveCharterListById,
-  saveBookContentById
-} from "./LocalRequest"
+  saveBookContentById,
+  saveSearchList,
+  getSearchList,
+  clearSearchList
+} from "./LocalRequest";
 
 export {
   getMainRanks,
@@ -32,5 +35,8 @@ export {
   saveBookDetailList,
   saveBookIdList,
   saveCharterListById,
-  saveBookContentById
+  saveBookContentById,
+  saveSearchList,
+  getSearchList,
+  clearSearchList
 };

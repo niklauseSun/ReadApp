@@ -76,6 +76,13 @@ const BookStack = createStackNavigator({
       header: null,
       tabBarVisible: false
     }
+  },
+  SearchView: {
+    screen: SearchView,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
   }
 });
 

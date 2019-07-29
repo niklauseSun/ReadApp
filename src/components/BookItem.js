@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { px } from '../utils'
+import { ASSET_IMAGES } from '../config';
 
 export default class BookItem extends Component {
   constructor(props) {
@@ -37,7 +38,9 @@ export default class BookItem extends Component {
           activeOpacity={0.7}
           style={styles.selectButton}
         >
-          {isLongSelect ? <View style={styles.selectView} /> : null}
+          {isLongSelect ? <View style={styles.selectView}>
+            {index > -1 ? <Image source={ASSET_IMAGES.ICON_SELECTED} />: <Image source={ASSET_IMAGES.ICON_SELECT} />}
+          </View> : null}
         </TouchableOpacity>
         <View style={styles.detail}>
           <Image style={styles.image} source={{ uri: image }} />

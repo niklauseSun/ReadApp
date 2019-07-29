@@ -81,6 +81,34 @@ const saveBookContentById = ({ data, charterId }) => {
   })
 }
 
+// 搜索历史
+
+const saveSearchList = ({ data }) => {
+  global.storage.save({
+    key: 'searchList',
+    data: data
+  })
+}
+const getSearchList = ({ callback}) => {
+  global.storage.load({
+    key: 'searchList'
+  }).then(ret => {
+    callback({
+      data: ret,
+      error: null
+    })
+  }).catch( err => {
+    callback({
+      error: err,
+      data: null
+    })
+  })
+}
+
+const clearSearchList = () => {
+  global.storage.clearMapForKey("searchList");
+}
+
 export {
   getBookList,
   getBookIdList,
@@ -89,6 +117,9 @@ export {
   saveBookDetailList,
   saveBookIdList,
   saveCharterListById,
-  saveBookContentById
+  saveBookContentById,
+  saveSearchList,
+  getSearchList,
+  clearSearchList,
 };
 

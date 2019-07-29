@@ -14,6 +14,7 @@ import { px } from '../utils'
 import { Header, Hud } from '../components';
 import { getBookDetail, saveBookIdList, saveBookDetailList } from "../requests";
 import { Toast } from "@ant-design/react-native";
+import { ASSET_IMAGES } from '../config';
 
 export default class BookDetail extends Component {
 
@@ -95,7 +96,7 @@ export default class BookDetail extends Component {
                 <Text style={styles.menuText}>目录</Text>
                 <Text style={styles.menuInfoText}>共{chapters}章</Text>
                 <View style={styles.menuIcon}>
-                  <Text>目录图标</Text>
+                  <Image source={ASSET_IMAGES.ICON_ARROW_RIGHT} />
                 </View>
               </TouchableOpacity>
             </ScrollView>
@@ -106,6 +107,7 @@ export default class BookDetail extends Component {
                 onPress={this.addBookAction.bind(this)}
               >
                 <View style={styles.addButtonView}>
+                  <Image source={ASSET_IMAGES.ICON_BOOK_ADD} />
                   <Text style={styles.addText}>加入书架</Text>
                 </View>
               </TouchableOpacity>
@@ -270,10 +272,14 @@ const styles = StyleSheet.create({
   addButton: {
     // marginLeft: px(40)
     width: px(120),
-    height: px(120)
+    height: px(120),
+    justifyContent: 'center'
   },
-  addButtonView: {},
+  addButtonView: {
+    alignItems: 'center'
+  },
   addText: {
+    marginTop: px(10),
     fontSize: px(26),
     color: "#A8ACB2"
   },

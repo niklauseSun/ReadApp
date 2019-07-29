@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import {
   Text,
   View,
@@ -12,14 +12,28 @@ import {
 import { SearchInputView, Header } from '../components';
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
+import {
+  getSearchList,
+  saveSearchList,
+  clearSearchList,
+  getSearchResult
+} from "../requests";
 
 export default class SearchView extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      historyList: ["ceshi1", "ceshi2", "ceshi3", "ceshi4"]
+      historyList: [],
+      searchWord: null,
+      showSearchResult: false,
+      searchResultList: [],
+      pageIndex: 1,
     }
+  }
+
+  componentDidMount() {
+    this.requestSearchHistory()
   }
 
   render() {
@@ -39,7 +53,7 @@ export default class SearchView extends Component {
 
   renderHistory = () => {
     return (
-      <View>
+      <Fragment>
         <View style={styles.historyHead}>
           <Text style={styles.historyHeadText}>搜索历史</Text>
           <TouchableOpacity onPress={this.deleteHistory.bind(this)}>
@@ -65,12 +79,21 @@ export default class SearchView extends Component {
           }}
           numColumns={3}
         />
-      </View>
+      </Fragment>
     );
   }
 
-  renderSearchResult() {
-
+  renderSearchResult = () => {
+    return (
+      <Fragment>
+        <FlatList
+          data={this.state.searchResultList}
+          renderItem={({ item }) => {
+            return <Text>test</Text>
+          }}
+        />
+      </Fragment>
+    )
   }
 
   // action
@@ -84,7 +107,53 @@ export default class SearchView extends Component {
 
   deleteHistory() {
     console.log('deleteHistory')
+    clearSearchList();
+    this.setState({
+      historyList: []
+    })
   }
+
+  // requests
+  requestSearchHistory() {
+    const data = {
+      callback: this.searchHistoryCallback.bind(this)
+    }
+
+    getSearchList(data);
+  }
+
+  searchHistoryCallback(res) {
+    const { error, data } = res;
+    if (error != null) {
+      this.setState({
+        historyList: data
+      })
+    }
+  }
+
+  requestSearchList() {
+    const data = {
+      callback: this.requestSearchHistory.bind(this),
+      keyword: this.state.searchWord
+    }
+
+    getSearchResult(data)
+  }
+
+  loadMoreSearchList() {
+
+  }
+
+  requestSearchListCallback(res) {
+    const { data, state } = res;
+    if (state == 1) {
+      this.setState({
+        searchResultList: data
+      })
+    }
+  }
+
+
 }
 
 const styles = StyleSheet.create({
