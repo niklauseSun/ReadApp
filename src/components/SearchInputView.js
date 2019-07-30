@@ -10,7 +10,7 @@ export default class SearchInputView extends Component {
   }
 
   render() {
-    const { onCancel } = this.props;
+    const { onCancel, onSearchAction, onChangeText } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.inputContent}>
@@ -19,6 +19,10 @@ export default class SearchInputView extends Component {
             placeholder={"搜索你感兴趣的内容"}
             placeholderTextColor={"#999999"}
             style={styles.input}
+            returnKeyType={"search"}
+            onSubmitEditing={onSearchAction}
+            onChangeText={onChangeText}
+            clearButtonMode={"while-editing"}
           />
         </View>
         <TouchableOpacity activeOpacity={0.7} onPress={onCancel}>

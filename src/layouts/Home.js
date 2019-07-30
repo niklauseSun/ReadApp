@@ -15,13 +15,14 @@ import {
   Text,
   StatusBar,
   FlatList,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  TouchableOpacity
 } from "react-native";
 
-import { Header, SearchBar, BookItem } from "../components"
+import { Header, SearchBar, BookItem, AddItem } from "../components"
 import { px } from '../utils';
-import { getBookList, getBookIdList } from '../requests'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { getBookList, getBookIdList, saveBookIdList, saveBookDetailList } from '../requests'
+import { _ } from 'lodash'
 
 class Home extends Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class Home extends Component {
       bookIdList: [],
       bookDetailList: [],
       isLongSelect: false,
-      selectIds: []
+      selectIds: [],
     };
   }
 
@@ -45,7 +46,14 @@ class Home extends Component {
 
   render() {
     const { bookDetailList } = this.state;
-    console.log("render", bookDetailList);
+
+    let dataArray = bookDetailList
+
+    if (dataArray.length == 0 || dataArray[dataArray.length - 1].type != 1) {
+      dataArray.push({type: 1})
+    }
+
+    console.log("render", bookDetailList, dataArray);
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -65,8 +73,13 @@ class Home extends Component {
               style={{
                 marginTop: px(42)
               }}
-              data={bookDetailList}
+              extraData={this.state.selectIds}
+              data={dataArray}
               renderItem={({ item, index }) => {
+                console.log('item', item)
+                if (item.type == 1) {
+                  return <AddItem addBook={this.addBook.bind(this)} />
+                }
                 return (
                   <BookItem
                     changeLongSelect={this.changeLongSelect.bind(this)}
@@ -135,16 +148,39 @@ class Home extends Component {
 
   deleteAction() {
     if (this.state.selectIds.length == 0) {
-      tshi.setState({
+      this.setState({
         isLongSelect: false
       });
     } else {
+      const { selectIds, bookDetailList } = this.state;
+      // for (let  )
+      let lastDetails = _.remove(bookDetailList, (n) => {
+        const { articleid } = n;
+        console.log('removes', n, this.state.bookIdList)
+        return selectIds.indexOf(articleid) > -1;
+      })
+
+      const ids = _.difference(this.state.bookIdList, selectIds)
+      console.log('ids', ids, selectIds, this.state.bookDetailList)
+
+      this.setState({
+        bookIdList: ids,
+        bookDetailList: bookDetailList,
+        isLongSelect: false
+      })
+      saveBookIdList({ data: ids })
+      saveBookDetailList({ data: bookDetailList })
+      // console.log('lastDetails', lastDetails)
     }
   }
 
   onSearch() {
     console.log("search", this.props.navigation);
-    this.props.navigation.push("SearchView");
+    this.props.navigation.navigate("SearchView");
+  }
+
+  addBook() {
+    this.props.navigation.navigate("SearchView")
   }
 
   goToHistory() {
@@ -196,6 +232,7 @@ class Home extends Component {
       bookDetailList: global.bookDetailList
     });
   }
+
 }
 
 const styles = StyleSheet.create({

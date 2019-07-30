@@ -1,25 +1,29 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, DeviceEventEmitter } from 'react-native';
 import { px } from '../utils';
 import { ASSET_IMAGES } from '../config'
+import { Toast } from '@ant-design/react-native'
+import { saveBookIdList, saveBookDetailList, getBookDetail } from '../requests'
+import { Hud } from '../components'
 
 export default class AddBookItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      bookDetail: null
     };
   }
 
   render() {
 
     const {
-      articlename = "天极",
-      intro = "不远处的中年妇女身影轻轻一动， 那惊人的速度又再次展现出来…",
+      articlename = "",
+      intro = "",
       image
     } = this.props.item || {};
 
     return (
-      <View style={styles.container}>
+      <TouchableOpacity onPress={this.goToDetail.bind(this)} style={styles.container}>
         {/* <View style={styles.image}>
           <Text>test</Text>
         </View> */}
@@ -31,12 +35,12 @@ export default class AddBookItem extends Component {
             {intro}
           </Text>
           <View style={styles.addButtonView}>
-            <TouchableOpacity style={styles.addButton}>
+            <TouchableOpacity onPress={this.requestBookDetail.bind(this)} style={styles.addButton}>
               <Text style={styles.addButtonText}>加入书架</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
   
@@ -51,6 +55,66 @@ export default class AddBookItem extends Component {
         return <Image source={ASSET_IMAGES.ICON_RATE_THREE} />
     }
   }
+
+  goToDetail() {
+    const { articleid } = this.props.item || {};
+    this.props.navigation.navigate("BookDetail", {
+      articleid: articleid
+    });
+  }
+
+  addBookAction() {
+    const { articleid } = this.state.bookDetail;
+    let nowDate = new Date()
+    const data = {
+      nowDate: nowDate,
+      charterIndex: 0,
+      ...this.state.bookDetail
+    }
+
+    console.log('addBookAction', data)
+
+    if (global.bookIdList.indexOf(articleid) == -1) {
+      console.log("数据中没有这个数据")
+
+      global.bookIdList.push(articleid);
+      global.bookDetailList.unshift(data);
+
+      console.log('dddd', global.bookDetailList, global.bookIdList)
+      saveBookIdList({ data: global.bookIdList })
+      saveBookDetailList({ data: global.bookDetailList })
+      Toast.show("添加成功！")
+      DeviceEventEmitter.emit("updateBookListEmit");
+    } else {
+      Toast.show("本书已添加到书库中！")
+    }
+
+  }
+
+  // request
+  requestBookDetail() {
+    const { articleid } = this.props.item
+    const data = {
+      articleid: articleid,
+      callback: this.bookDetailCallback.bind(this)
+    }
+    getBookDetail(data);
+    Hud.show();
+  }
+
+  // callback
+  bookDetailCallback(res) {
+    console.log('bookDetail', res)
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        bookDetail: data
+      }, () => {
+        this.addBookAction()
+      });
+      Hud.hidden()
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -63,13 +127,11 @@ const styles = StyleSheet.create({
   image: {
     height: px(180),
     width: px(122),
-    backgroundColor: 'red'
   },
   tagView: {
     height: px(140),
     width: px(64),
     marginLeft: px(-6),
-    backgroundColor: 'blue',
     marginRight: px(28)
   },
   detail: {

@@ -32,6 +32,10 @@ const getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null})
 const getBookContent = ({articleid, chapterid, callback = null }) => {
   getRequest(`Api/Article/${articleid}/${chapterid}`, callback);
 }
+
+const getAd = ({ adType, callback = null }) => {
+  getRequest(`Api/Article/Ad/${adType}`, callback)
+}
 // 1.	Api/Article/Detail/{articleid} 文章详情
 // 1.	Api/ Article /Chapters/{articleid}?pageIndex=1&pageSize=10 章节目录
 // 1.	Api/Article/ {articleid}/{chapterid} 章节内容
@@ -77,5 +81,6 @@ export {
   getSearchResult,
   getBookDetail,
   getMenuList,
-  getBookContent
+  getBookContent,
+  getAd
 };

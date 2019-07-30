@@ -9,6 +9,7 @@ import RankItem from './RankItem'
 import AddBookItem from './AddBookItem'
 import Hud from './Hud'
 import SearchInputView from "./SearchInputView";
+import AddItem from './AddItem'
 
 export {
   Header,
@@ -21,5 +22,6 @@ export {
   RankItem,
   AddBookItem,
   Hud,
-  SearchInputView
+  SearchInputView,
+  AddItem
 };

@@ -93,11 +93,13 @@ const getSearchList = ({ callback}) => {
   global.storage.load({
     key: 'searchList'
   }).then(ret => {
+    console.log('getSearchList', ret)
     callback({
       data: ret,
       error: null
     })
   }).catch( err => {
+    console.log('eeee')
     callback({
       error: err,
       data: null

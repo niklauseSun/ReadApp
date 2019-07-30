@@ -4,7 +4,8 @@ import {
   getSearchResult,
   getBookDetail,
   getMenuList,
-  getBookContent
+  getBookContent,
+  getAd
 } from "./request.js";
 
 import {
@@ -38,5 +39,6 @@ export {
   saveBookContentById,
   saveSearchList,
   getSearchList,
-  clearSearchList
+  clearSearchList,
+  getAd
 };

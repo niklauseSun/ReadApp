@@ -4,6 +4,7 @@ const ASSET_IMAGES = {
   ICON_MY_BOOK_SELECTED: require('../assets/myBookSelected.png'),
   ICON_MY_BOOK_UN_SELECTED: require('../assets/myBookUnSelected.png'),
   ICON_PERSONAL_SELECTED: require('../assets/personalSelected.png'),
+  ICON_PERSONAL_UN_SELECT: require('../assets/personalUnSelected.png'),
   ICON_HISTORY: require('../assets/history.png'),
   ICON_SEARCH: require('../assets/iconSearch.png'),
   ICON_DELETE: require('../assets/deleteIcon.png'),
@@ -18,6 +19,8 @@ const ASSET_IMAGES = {
   ICON_MENU_BUTTON: require('../assets/menuButton.png'),
   ICON_CONTENT_SET_BUTTON: require('../assets/contentSet.png'),
   ICON_BRIGHT: require('../assets/bright.png'),
+  ICON_ARROW_LEFT: require('../assets/arrowLeft.png'),
+  ICON_ADD: require('../assets/iconAdd.png'),
 }
 
 export default ASSET_IMAGES

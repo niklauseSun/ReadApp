@@ -1,14 +1,26 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, DeviceEventEmitter } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
+import { saveBookDetailList } from '../requests'
 
 export default class BookItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isSelect: false
+      isSelect: false,
+      index : -1,
     };
+  }
+
+  componentDidMount() {
+    const {
+      articleid
+    } = this.props.item || {};
+    let ind = this.props.selectIds.indexOf(articleid)
+    this.setState({
+      index: ind,
+    })
   }
 
   render() {
@@ -25,7 +37,8 @@ export default class BookItem extends Component {
 
     console.log('isLongSelect',this.props, isLongSelect)
 
-    let index = selectIds.indexOf(articleid);
+    const { index } = this.state;
+    // let index = selectIds.indexOf(articleid);
     // index > -1 时被选中
     return (
       <TouchableOpacity
@@ -37,6 +50,7 @@ export default class BookItem extends Component {
         <TouchableOpacity
           activeOpacity={0.7}
           style={styles.selectButton}
+          onPress={this.selectBook.bind(this)}
         >
           {isLongSelect ? <View style={styles.selectView}>
             {index > -1 ? <Image source={ASSET_IMAGES.ICON_SELECTED} />: <Image source={ASSET_IMAGES.ICON_SELECT} />}
@@ -57,7 +71,24 @@ export default class BookItem extends Component {
 
   goToBookContent() {
     if (!this.state.isLongSelect) {
-      this.props.navigation.navigate("BookContent");
+      let testArray = [ ...global.bookDetailList ]
+      let index = testArray.indexOf(this.props.item);
+      let tmpArray = this.itemToArrayTop(testArray, index)
+
+      global.bookDetailList = tmpArray;
+
+      saveBookDetailList({ data: global.bookDetailList })
+      DeviceEventEmitter.emit("updateBookListEmit");
+
+      const {
+        charterIndex,
+        articleid
+      } = this.props.item
+
+      this.props.navigation.navigate("BookContent", {
+        articleid: articleid,
+        chapterid: charterIndex
+      });
     }
   }
 
@@ -71,12 +102,32 @@ export default class BookItem extends Component {
     const { changeSelect, selectIds } = this.props;
     const { articleid } = this.props.item || {};
 
+    console.log('selectBook')
     if (selectIds.indexOf(articleid) > -1) {
       changeSelect(articleid, true)
+      
     } else {
       changeSelect(articleid, false)
     }
+    this.setState({
+      index: selectIds.indexOf(articleid)
+    })
+  }
 
+  itemToArrayTop(Arr, index) {
+    let tmp = Arr[index];
+    if (index == 0) {
+      return Arr;
+    }
+    for (let i = 0; i < Arr.length; i++) {
+      if (Arr[i].articleid == Arr[index].articleid) {
+        Arr.splice(i, 1);
+        break;
+      }
+    }
+    tmp.nowDate = new Date();
+    Arr.unshift(tmp);
+    return Arr;
   }
 }
 

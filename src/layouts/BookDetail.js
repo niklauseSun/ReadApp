@@ -141,7 +141,9 @@ export default class BookDetail extends Component {
 
   addBookAction() {
     const { articleid } = this.state.bookDetail;
+    let nowDate = new Date()
     const data = {
+      nowDate: nowDate,
       charterIndex: 0,
       ...this.state.bookDetail
     }

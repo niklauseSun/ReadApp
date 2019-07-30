@@ -3,6 +3,9 @@ import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Moda
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import { Slider } from '@ant-design/react-native'
+import { getBookContent, getMenuList, getAd } from '../requests'
+import { WebView } from 'react-native-webview';
+
 
 const colors = ['#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
 
@@ -10,19 +13,39 @@ export default class BookContent extends Component {
 
   constructor(props) {
     super(props);
+
+    const { articleid, chapterid } = props.navigation.state.params || {}
+
     this.state = {
-      bottomModal: true,
+      articleid: articleid,
+      chapterid: chapterid,
+      menuIndex: 1,
+      charterList: null,
+      bottomModal: false,
       menuListModal: false,
       setModal:false,
       colorArray: [0,1,2,3,4],
       contentFontSize: 12,
       contentBackgroundColor: '#fff',
       contentDirection: true, // true 上下 false 左右
-      contentLineHeight: 12
+      contentLineHeight: 12,
+      bookContent: null,
+      headUrl:'',
+      bottomUrl: null,
     }
   }
 
+  componentDidMount() {
+    // this.requestBookContent()
+    this.requestMenuList()
+    this.requestHeadAd()
+    this.requestBottomAd()
+  }
+
   render() {
+
+    console.log('test', this.props)
+
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -34,7 +57,17 @@ export default class BookContent extends Component {
               bottomModal: !this.state.bottomModal
             })
           }} style={styles.content}>
-            <Text>BookContent</Text>
+            <View style={styles.headAd}>
+              <WebView srouce={{ uri: this.state.headUrl}}>
+
+              </WebView>
+            </View>
+            <View style={styles.readContent}>
+
+            </View>
+            <View style={ styles.bottomAd}>
+
+            </View>
             {/* {this.renderBottomModal()} */}
           </TouchableOpacity>
           {/* <View style={styles.bottomView}> */}
@@ -46,7 +79,7 @@ export default class BookContent extends Component {
             </TouchableOpacity> */}
           {/* </View> */}
           <Modal
-            animationType="slide"
+            animationType="fade"
             transparent={true}
             visible={this.state.bottomModal}
             onRequestClose={() => {
@@ -62,6 +95,16 @@ export default class BookContent extends Component {
                 }}
                 style={styles.headModalView}
               >
+                <TouchableOpacity onPress={() => {
+                  this.setState({
+                    bottomModal: false
+                  },() => {
+                    this.props.navigation.goBack()
+                  })
+                  
+                }}>
+                  <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text>
+                </TouchableOpacity>
               </TouchableOpacity>
               <View style={styles.bottomModalView}>
                 <View style={styles.bottomContainer}>
@@ -103,16 +146,25 @@ export default class BookContent extends Component {
             <View style={{ flexDirection: 'row'}}>
               <SafeAreaView style={{ backgroundColor: 'red', width: '80%' }}>
                 <TouchableOpacity onPress={() => {
+                  
+                  
+                }}
+                  style={{ height: '100%',backgroundColor: 'blue'}}
+                >
+                  <Text>test</Text>
+                </TouchableOpacity>
+                
+              </SafeAreaView>
+              <View style={{ justifyContent: 'center',height:'100%' }}>
+                <TouchableOpacity onPress={() => {
                   this.setState({
                     bottomModal: false,
                     menuListModal: false
                   })
                 }}>
-                  <Text>test</Text>
+                  <Image source={ASSET_IMAGES.ICON_ARROW_LEFT} />
                 </TouchableOpacity>
-                
-              </SafeAreaView>
-              <Text>测试</Text>
+              </View>
             </View>
               
             </Modal>
@@ -156,7 +208,7 @@ export default class BookContent extends Component {
                 <View style={styles.backgroundSetView}>
                   <Text style={styles.backgroundText}>背景</Text>
                   <FlatList
-                    data={['#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']}
+                    data={['#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']}
                     // style={{ backgroundColor: 'blue'}}
                     horizontal={true}
                     renderItem={({item, index}) => {
@@ -200,8 +252,91 @@ export default class BookContent extends Component {
     )
   }
 
-  renderBottomModal() {
-    return 
+  // request
+  requestBookContent() {
+    const { chapterid } = this.state.charterList[this.state.chapterid]
+    const data = {
+      callback: this.requestBookContentCallback.bind(this),
+      chapterid: chapterid,
+      articleid: this.state.articleid
+    }
+    console.log('request', data)
+    getBookContent(data)
+  }
+
+  requestBookContentCallback(res) {
+    const { data, state } = res;
+    if (state == 1) {
+      this.setState({
+        bookContent: data
+      })
+    }
+  }
+
+  requestMenuList() {
+    const data = {
+      pageIndex: 1,
+      pageSize: 10,
+      articleid: this.state.articleid,
+      callback: this.requestMenuListCallback.bind(this)
+    }
+    getMenuList(data)
+  }
+
+  requestMenuListCallback(res) {
+    const { data, state, page } = res;
+    if (state == 1) {
+      const { records } = page
+      const requestData = {
+        pageIndex: 1,
+        pageSize: records,
+        articleid: this.state.articleid,
+        callback: this.requestFullMenuListCallback.bind(this)
+      }
+      getMenuList(requestData);
+    }
+  }
+
+  requestFullMenuListCallback(res) {
+    console.log('fullmenu', res)
+    const { data, state } = res;
+    if (state == 1) {
+      this.setState({
+        charterList: data,
+      }, () => {
+          this.requestBookContent()
+      })
+    }
+  }
+
+  requestHeadAd() {
+    const data = {
+      callback: this.requestHeadAdCallback.bind(this),
+      adType: 5
+    }
+    getAd(data)
+  }
+
+  requestHeadAdCallback(res) {
+    console.log('head add', res)
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        headUrl: data.Url,
+      })
+    }
+  }
+
+  requestBottomAd() {
+    const data = {
+      callback: this.requestBottomAdCallback.bind(this),
+      adType: 6
+    }
+    getAd(data)
+  }
+
+  requestBottomAdCallback(res) {
+    console.log('bottomAd', res)
   }
 }
 
@@ -221,14 +356,13 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     height: px(100),
-    // backgroundColor: 'red',
     flexDirection: 'row',
     // flex: 1
     // width: '100%'
   },
   menuButton: {
     flex: 1,
-    backgroundColor: 'blue',
+    // backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -260,7 +394,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     height: px(138),
     width: '100%',
-    // backgroundColor: '#fff',
+    backgroundColor: '#fff',
     flexDirection: "row"
   },
   setModalContent: {
@@ -422,6 +556,19 @@ const styles = StyleSheet.create({
     width: px(76),
     height: px(76),
     borderRadius: px(38),
-    marginRight: px(60)
+    marginRight: px(60),
+    borderColor: '#D8D8D8',
+    borderWidth: px(0.5)
+  },
+  headAd: {
+    height: px(120),
+    backgroundColor: 'blue'
+  },
+  bottomAd: {
+    height: px(120),
+    backgroundColor: 'red'
+  },
+  readContent: {
+    flex: 1
   }
 });

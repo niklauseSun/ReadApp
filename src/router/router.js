@@ -33,6 +33,20 @@ const HomeStack = createStackNavigator({
       tabBarVisible: false
     }
   },
+  BookDetail: {
+    screen: BookDetail,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  MenuList: {
+    screen: MenuList,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
   SearchView: {
     screen: SearchView,
     navigationOptions: {
@@ -194,7 +208,7 @@ const TabNavigator = createBottomTabNavigator(
             return (
               <Image
                 style={styles.styles}
-                source={ASSET_IMAGES.ICON_PERSONAL_SELECTED}
+                source={ASSET_IMAGES.ICON_PERSONAL_UN_SELECT}
               />
             );
           }

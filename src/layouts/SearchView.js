@@ -9,7 +9,7 @@ import {
   FlatList,
   TouchableOpacity
 } from "react-native";
-import { SearchInputView, Header } from '../components';
+import { SearchInputView, Header, RankHeadItem } from '../components';
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import {
@@ -43,15 +43,23 @@ export default class SearchView extends Component {
         <SafeAreaView style={styles.safeView}>
           {/* <Header navigation={this.props.navigation} showBackButton={true}/> */}
           <View style={styles.content}>
-            <SearchInputView onCancel={this.onCancel.bind(this)} />
-            {this.renderHistory()}
+            <SearchInputView
+              onSearchAction={this.onSearchAction.bind(this)}
+              onCancel={this.onCancel.bind(this)}
+              onChangeText={this.onChangeText.bind(this)}
+              />
+              {this.state.searchWord == null || this.state.searchWord.length == 0 ? this.renderHistory(this.state.historyList): 
+              this.renderSearchResult(this.state.searchResultList)}
+            {/* {this.renderHistory(this.state.historyList)} */}
+
+            {/* {this.renderSearchResult(this.state.searchResultList)} */}
           </View>
         </SafeAreaView>
       </View>
     )
   }
 
-  renderHistory = () => {
+  renderHistory = (historyList) => {
     return (
       <Fragment>
         <View style={styles.historyHead}>
@@ -64,7 +72,7 @@ export default class SearchView extends Component {
           </TouchableOpacity>
         </View>
         <FlatList
-          data={this.state.historyList}
+          data={historyList}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -83,13 +91,23 @@ export default class SearchView extends Component {
     );
   }
 
-  renderSearchResult = () => {
+  renderSearchResult = (searchResultList) => {
     return (
       <Fragment>
         <FlatList
-          data={this.state.searchResultList}
+          style={{marginTop: px(30), backgroundColor: '#fff'}}
+          data={searchResultList}
           renderItem={({ item }) => {
-            return <Text>test</Text>
+            return <RankHeadItem item={item} navigation={this.props.navigation} />
+          }}
+          ItemSeparatorComponent={() => {
+            return <View style={{ height: px(30) }} />
+          }}
+
+          ListEmptyComponent={() => {
+            return (
+              <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', height: px(60)}}><Text style={{ color: '#999'}}>暂无数据</Text></View>
+            )
           }}
         />
       </Fragment>
@@ -105,6 +123,22 @@ export default class SearchView extends Component {
     console.log('addToSearch', item)
   }
 
+  onSearchAction() {
+    console.log('search 111',this.state.searchWord)
+    if (this.state.searchWord == null || this.state.searchWord.length == 0) {
+      return;
+    }
+    console.log('test')
+    this.requestSearchList()
+  }
+
+  onChangeText(text) {
+    console.log('onChangeText', text)
+    this.setState({
+      searchWord: text
+    })
+  }
+
   deleteHistory() {
     console.log('deleteHistory')
     clearSearchList();
@@ -118,22 +152,22 @@ export default class SearchView extends Component {
     const data = {
       callback: this.searchHistoryCallback.bind(this)
     }
-
     getSearchList(data);
   }
 
   searchHistoryCallback(res) {
     const { error, data } = res;
-    if (error != null) {
+    if (error == null) {
+      console.log('searchHistory', data)
       this.setState({
-        historyList: data
+        historyList: data || []
       })
     }
   }
 
   requestSearchList() {
     const data = {
-      callback: this.requestSearchHistory.bind(this),
+      callback: this.requestSearchListCallback.bind(this),
       keyword: this.state.searchWord
     }
 
@@ -147,12 +181,45 @@ export default class SearchView extends Component {
   requestSearchListCallback(res) {
     const { data, state } = res;
     if (state == 1) {
-      this.setState({
-        searchResultList: data
-      })
+      const { historyList = [] } = this.state;
+      console.log('history', historyList)
+      if (historyList.indexOf(this.state.searchWord) > -1) {
+        let index = historyList.indexOf(this.state.searchWord)
+        let tmpArray = this.itemToArrayTop(historyList, index)
+        this.setState({
+          searchResultList: data,
+          historyList: tmpArray
+        })
+        saveSearchList({
+          data: tmpArray
+        })
+      } else {
+        this.setState({
+          searchResultList: data,
+          historyList: [this.state.searchWord, ...historyList]
+        }, ()=> {
+            saveSearchList({
+              data: this.state.historyList
+            })
+        })
+      }
     }
   }
 
+  itemToArrayTop(Arr, index) {
+    let tmp = Arr[index];
+    if (index == 0) {
+      return Arr;
+    }
+    for (let i = 0; i < Arr.length; i++) {
+      if (Arr[i] == Arr[index]) {
+        Arr.splice(i, 1);
+        break;
+      }
+    }
+    Arr.unshift(tmp);
+    return Arr;
+  }
 
 }
 

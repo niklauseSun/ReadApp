@@ -115,14 +115,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={subRankData == null ? {} : subRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={subRankData == null ? {} : subRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={subRankData == null ? {} : subRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
@@ -140,14 +143,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={secondRankData == null ? {} : secondRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={secondRankData == null ? {} : secondRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={secondRankData == null ? {} : secondRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
@@ -165,14 +171,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={thirdRankData == null ? {} : thirdRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={thirdRankData == null ? {} : thirdRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={thirdRankData == null ? {} : thirdRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
@@ -190,14 +199,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={fourRankData == null ? {} : fourRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
@@ -214,14 +226,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={fiveRankData == null ? {} : fiveRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
@@ -239,14 +254,17 @@ class Books extends Component {
                 <View style={styles.predictContent}>
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[0]}
+                    navigation={this.props.navigation}
                     rate={0}
                   />
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[1]}
+                    navigation={this.props.navigation}
                     rate={1}
                   />
                   <AddBookItem
                     item={sixRankData == null ? {} : sixRankData[2]}
+                    navigation={this.props.navigation}
                     rate={2}
                   />
                 </View>
