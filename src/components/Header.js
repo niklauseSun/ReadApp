@@ -23,7 +23,7 @@ export default class Header extends Component {
             </TouchableOpacity>
           ) : null}
         </View>
-        <Text style={styles.titleStyle}>{title}</Text>
+        <Text numberOfLines={1} style={styles.titleStyle}>{title}</Text>
         <View style={styles.right}>{showRightButton ? (
           <TouchableOpacity activeOpacity={0.7} style={styles.rightButton} onPress={rightButtonAction}>
             <Text style={styles.rightButtonText}>{rightButtonText}</Text>
@@ -49,11 +49,15 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   titleStyle: {
-    fontSize: px(32)
+    fontSize: px(32),
+    flex: 3,
+    textAlign: 'center'
   },
   left: {
     flex: 1,
-    marginLeft: px(30)
+    marginLeft: px(30),
+    // height: 45,
+    justifyContent: 'center',
   },
   right: {
     flex: 1,
@@ -69,5 +73,6 @@ const styles = StyleSheet.create({
   goBack: {
     width: px(120),
     height: px(120),
+    justifyContent: 'center'
   }
 });

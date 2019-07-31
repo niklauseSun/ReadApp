@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { px } from '../utils'
+import { ASSET_IMAGES } from '../config'
 
 export default class SetItem extends Component {
   constructor(props) {
@@ -10,15 +11,15 @@ export default class SetItem extends Component {
   }
 
   render() {
-    const { title = "清除缓存", action = null } = this.props
+    const { title = "清除缓存", action = null, img } = this.props
     return (
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={action}
         style={styles.container}>
-        <View style={styles.itemImg}></View>
+        <Image style={styles.itemImg} source={img} />
         <Text style={styles.title}>{title}</Text>
-        <View style={styles.arrow}></View>
+        <Image style={styles.arrow} source={ASSET_IMAGES.ICON_ARROW_RIGHT} />
       </TouchableOpacity>
     );
   }
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
   itemImg: {
     width: px(40),
     height: px(40),
-    backgroundColor: 'blue',
     marginLeft: px(30),
   },
   title: {
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
   arrow: {
     width: px(20),
     height: px(20),
-    backgroundColor: 'red',
     marginRight: px(30),
   }
 })

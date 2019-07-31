@@ -17,6 +17,7 @@
     "react-native-img-cache": "^1.6.0",
     "react-native-render-html": "^4.1.2",
     "react-native-root-siblings": "^3.2.1",
+    "react-native-splash-screen": "^3.2.0",
     "react-native-storage": "^1.0.1",
     "react-native-webview": "^5.12.1",
     "react-navigation": "^3.11.1"

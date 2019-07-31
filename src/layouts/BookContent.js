@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import { Slider, Toast } from '@ant-design/react-native'
@@ -8,9 +8,11 @@ import {
   getMenuList,
   getAd,
   getSetConfig,
+  saveBookDetailList,
   saveSetConfig } from '../requests'
 import { WebView } from 'react-native-webview';
 import HTML from 'react-native-render-html'
+import { Header } from '../components'
 
 const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
 
@@ -131,7 +133,8 @@ export default class BookContent extends Component {
                   })
                   
                 }}>
-                  <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} />
+                  {/* <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} /> */}
+                  <Header title={this.state.charterList == null ? "" : this.state.charterList[this.state.chapterid].chaptername} showBackButton={true} navigation={this.props.navigation} />
                   {/* <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -173,15 +176,26 @@ export default class BookContent extends Component {
               Alert.alert('Modal has been closed.');
             }}>
             <View style={{ flexDirection: 'row'}}>
-              <SafeAreaView style={{ backgroundColor: 'red', width: '80%' }}>
-                <TouchableOpacity onPress={() => {
-                  
-                  
-                }}
-                  style={{ height: '100%',backgroundColor: 'blue'}}
-                >
-                  <Text>test</Text>
-                </TouchableOpacity>
+              <SafeAreaView style={{ backgroundColor: '#fff', width: '80%' }}>
+                <FlatList
+                  data={this.state.charterList}
+                  renderItem = {({ item, index }) => {
+                    return (
+                      <TouchableOpacity onPress={() => {
+                        // this.props.navigation.navigate("BookContent")
+                        this.setState({
+                          chapterid: index,
+                          menuListModal: false,
+                        }, () => {
+                          this.requestBookContent()
+                          this.updateBookDetailList()
+                        })
+                      }} style={styles.itemContent}>
+                        <Text style={styles.chapterName}>{item.chaptername}</Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
                 
               </SafeAreaView>
               <View style={{ justifyContent: 'center',height:'100%' }}>
@@ -486,6 +500,16 @@ export default class BookContent extends Component {
     }
     saveSetConfig({ data });
   }
+
+  updateBookDetailList() {
+    const detail = global.bookDetailList[0];
+    detail.nowDate = new Date();
+    detail.charterIndex = this.state.chapterid
+    global.bookDetailList[0] = detail
+
+    saveBookDetailList({ data: global.bookDetailList })
+    DeviceEventEmitter.emit("updateBookListEmit");
+  }
 }
 
 const styles = StyleSheet.create({
@@ -717,5 +741,15 @@ const styles = StyleSheet.create({
   readContent: {
     flex: 1,
     paddingVertical: px(20)
+  },
+  itemContent: {
+    height: px(100),
+    //   alignItems: "center"
+    justifyContent: "center",
+    paddingLeft: px(20)
+  },
+  chapterName: {
+    color: "#656E79",
+    fontSize: px(30)
   }
 });

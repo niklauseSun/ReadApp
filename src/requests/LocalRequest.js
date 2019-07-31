@@ -135,6 +135,10 @@ const getSetConfig = ({ callback }) => {
   })
 }
 
+const clearAllCache = () => {
+  global.storage.clearMap()
+}
+
 export {
   getBookList,
   getBookIdList,
@@ -149,5 +153,6 @@ export {
   clearSearchList,
   getSetConfig,
   saveSetConfig,
+  clearAllCache,
 };
 

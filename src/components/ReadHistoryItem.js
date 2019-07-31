@@ -10,14 +10,17 @@ export default class ReadHistoryItem extends Component {
   }
 
   render() {
-    const { title = "玛格是座城", subTitle = "2019-06-30 16:45" } = this.props
+    const { articlename = "", nowDate = "" } = this.props.item
+    console.log('item', this.props)
     return (
       <View style={styles.container}>
-        <Text style={styles.titleStyle}>{title}</Text>
-        <Text style={styles.subStyle}>{subTitle}</Text>
+        <Text style={styles.titleStyle}>{articlename}</Text>
+        <Text style={styles.subStyle}>{new Date(nowDate).toLocaleString()}</Text>
       </View>
     );
   }
+
+
 }
 
 const styles = StyleSheet.create({

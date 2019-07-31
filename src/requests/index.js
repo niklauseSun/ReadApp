@@ -22,6 +22,7 @@ import {
   clearSearchList,
   getSetConfig,
   saveSetConfig,
+  clearAllCache,
 } from "./LocalRequest";
 
 export {
@@ -45,4 +46,5 @@ export {
   getAd,
   getSetConfig,
   saveSetConfig,
+  clearAllCache
 };

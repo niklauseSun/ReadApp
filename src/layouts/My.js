@@ -6,7 +6,7 @@
  * @flow
  */
 
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,7 +14,10 @@ import {
   Text,
   StatusBar,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  Image,
+  DeviceEventEmitter,
+  FlatList
 } from "react-native";
 
 import {
@@ -23,69 +26,96 @@ import {
 
 import { Header, Line, ReadHistoryItem, SetItem } from "../components"
 import { px } from "../utils"
+import { ASSET_IMAGES } from "../config";
+import { clearAllCache } from "../requests"
+import { Toast, Modal } from '@ant-design/react-native'
+
 class My extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      historyList: null
     };
   }
 
+  componentDidMount() {
+    this.subscription = DeviceEventEmitter.addListener(
+      "updateBookListEmit",
+      this.loadHistory.bind(this)
+    );
+    this.loadHistory()
+  }
+
+  componentWillUnmount() {
+    this.subscription = null
+  }
+
   render() {
+    console.log('my my', this.state.historyList)
     const { age = 17, time = 3, bookNum = 2 } = this.props
     return (
       <ScrollView style={styles.container}>
         <StatusBar barStyle="light-content" />
         <View style={styles.headBg}>
           <View style={styles.info}>
-            <View style={styles.headImage}>
+            {/* <View style={styles.headImage}>
 
-            </View>
+            </View> */}
+            <Image style={styles.headImage} source={ASSET_IMAGES.ICON_DEFAULT_HEADIMAGE} />
             <View style={styles.subInfo}>
-              <Text style={styles.userName}>一粒沙</Text>
+              {/* <Text style={styles.userName}>一粒沙</Text>
               <View style={styles.genderInfoLine}>
                 <View style={styles.genderImage}></View>
                 <Text style={styles.ageInfo}>{age}岁</Text>
-              </View>
+              </View> */}
+              {/* <Text style={styles.readTime}>阅读{time}分</Text> */}
+              <Text style={styles.readNums}>读过{global.bookDetailList == null || global.bookDetailList.length == 0 ? 0: global.bookDetailList.length - 1}本书</Text>
             </View>
           </View>
-          <View style={styles.readInfo}>
+          {/* <View style={styles.readInfo}>
             <Text style={styles.readTime}>阅读{time}分</Text>
             <Text style={styles.readNums}>读过{bookNum}本书</Text>
-          </View>
+          </View> */}
         </View>
         <View style={styles.content}>
           {/* 阅读历史 */}
           <View style={styles.history}>
             <View style={styles.historyHead}>
-              <View style={styles.historyImage}>
-
-              </View>
+              <Image style={styles.historyImage} source={ASSET_IMAGES.ICON_PERSONAL_HISTORY} />
               <Text style={styles.historyText}>阅读历史</Text>
             </View>
-            <Line />
-            <ReadHistoryItem title={"白发皇妃"} />
-            <Line />
-            <ReadHistoryItem />
-            <Line />
+            {(this.state.historyList == null || this.state.historyList.length == 0) ?<Text style={{ marginLeft: px(100) }}>暂无数据</Text>:
+                <FlatList
+                  // style={{ backgroundColor: 'red', height: px(227)}}
+                  data={this.state.historyList}
+                  renderItem={({item}) => {
+                    console.log('render', item)
+                    if (item.type != 1) {
+                      return <ReadHistoryItem item={item} />
+                    }
+                  }}
+                />
+            }
+            
           </View>
           {/* 清除缓存 */}
           <View style={styles.clearCache}>
-            <SetItem action={this.clearCache} />
+            <SetItem img={ASSET_IMAGES.ICON_CLEAN_CACHE} action={this.clearCache} />
           </View>
           <View style={styles.about}>
-            <SetItem title={"关于该阅读APP"}  action={this.gotoAbout}/>
+            <SetItem img={ASSET_IMAGES.ICON_ABOUT} title={"关于该阅读APP"}  action={this.gotoAbout}/>
           </View>
           {/* 关于该阅读APP */}
         </View>
         
         {/* 推出登录 */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.logoutButton}
           activeOpacity={0.7}
           onPress={this.logout}
-        >
-          <Text style={styles.logoutText}>退出登录</Text>
-        </TouchableOpacity>
+        > */}
+          {/* <Text style={styles.logoutText}>退出登录</Text> */}
+        {/* </TouchableOpacity> */}
       </ScrollView>
     );
   }
@@ -93,14 +123,32 @@ class My extends Component {
   // actions
   clearCache = () => {
     console.log('clearCache')
+    Modal.alert('提示！', '确定要清楚缓存么？',[{
+      text: '取消',
+      style: 'cancel'
+    }, {
+      text: '确定',
+      onPress: () => {
+        clearAllCache()
+      }
+    }]);
   }
 
   gotoAbout = () => {
-    console.log('goto about')
+    // console.log('goto about')
   }
 
   logout = () => {
-    console.log('logout')
+    // console.log('logout')
+  }
+
+  loadHistory = () => {
+    // console.log('history', global.bookDetailList)
+    const detailList = global.bookDetailList.slice(0,2)
+    console.log('detail', detailList);
+    this.setState({
+      historyList: detailList
+    })
   }
 }
 
@@ -125,7 +173,6 @@ const styles = StyleSheet.create({
   headImage: {
     height: px(110),
     width: px(110),
-    backgroundColor: 'black',
     borderRadius: px(55),
     borderWidth: px(2),
     borderColor: 'white',
@@ -181,7 +228,6 @@ const styles = StyleSheet.create({
   historyImage: {
     width: px(40),
     height: px(40),
-    backgroundColor: 'red',
     alignItems: 'center',
     marginLeft: px(30),
     marginRight: px(24),
