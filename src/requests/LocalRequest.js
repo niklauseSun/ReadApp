@@ -111,6 +111,30 @@ const clearSearchList = () => {
   global.storage.clearMapForKey("searchList");
 }
 
+// 保存设置
+const saveSetConfig = ({ data }) => {
+  global.storage.save({
+    key: 'setConfig',
+    data: data
+  })
+}
+
+const getSetConfig = ({ callback }) => {
+  global.storage.load({
+    key: 'setConfig'
+  }).then(ret => {
+    callback({
+      data: ret,
+      error: null
+    })
+  }).catch(err => {
+    callback({
+      error: err,
+      data: null
+    })
+  })
+}
+
 export {
   getBookList,
   getBookIdList,
@@ -123,5 +147,7 @@ export {
   saveSearchList,
   getSearchList,
   clearSearchList,
+  getSetConfig,
+  saveSetConfig,
 };
 

@@ -21,6 +21,9 @@ const ASSET_IMAGES = {
   ICON_BRIGHT: require('../assets/bright.png'),
   ICON_ARROW_LEFT: require('../assets/arrowLeft.png'),
   ICON_ADD: require('../assets/iconAdd.png'),
+  ICON_GO_BACK: require('../assets/goBack.png'),
+  ICON_ABOUT: require('../assets/iconAbout.png'),
+  ICON_PERSONAL_HISTORY: require('../assets/personalHistory.png')
 }
 
 export default ASSET_IMAGES

@@ -1,13 +1,18 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
-import { Slider } from '@ant-design/react-native'
-import { getBookContent, getMenuList, getAd } from '../requests'
+import { Slider, Toast } from '@ant-design/react-native'
+import {
+  getBookContent,
+  getMenuList,
+  getAd,
+  getSetConfig,
+  saveSetConfig } from '../requests'
 import { WebView } from 'react-native-webview';
+import HTML from 'react-native-render-html'
 
-
-const colors = ['#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
+const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
 
 export default class BookContent extends Component {
 
@@ -25,10 +30,11 @@ export default class BookContent extends Component {
       menuListModal: false,
       setModal:false,
       colorArray: [0,1,2,3,4],
-      contentFontSize: 12,
+      colorIndex: 0,
+      contentFontSize: 16,
       contentBackgroundColor: '#fff',
       contentDirection: true, // true 上下 false 左右
-      contentLineHeight: 12,
+      contentLineHeight: 16,
       bookContent: null,
       headUrl:'',
       bottomUrl: null,
@@ -40,36 +46,58 @@ export default class BookContent extends Component {
     this.requestMenuList()
     this.requestHeadAd()
     this.requestBottomAd()
+    this.getLocalConfig()
   }
 
   render() {
 
-    console.log('test', this.props)
-
+    console.log('test', this.props, this.state.contentLineHeight)
+    const htmlContent = `<script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script>`
+    const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
     return (
-      <View style={styles.container}>
+      <View style={[styles.container]}>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => {
             this.setState({
               bottomModal: !this.state.bottomModal
             })
-          }} style={styles.content}>
+          }} style={styles.content}> */}
             <View style={styles.headAd}>
-              <WebView srouce={{ uri: this.state.headUrl}}>
+              <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlContent}}>
+
+              </WebView>
+              {/* <HTML html={htmlContent} /> */}
+            </View>
+          <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
+              <ScrollView style={{ paddingVertical: px(20), paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  style={{
+                    backgroundColor: this.colorChange(this.state.colorIndex)
+                  }}
+                  onPress={() => {
+                  this.setState({
+                    bottomModal: !this.state.bottomModal
+                  })
+                }} style={styles.content}>
+                <Text style={{
+                  fontSize: this.state.contentFontSize,
+                  lineHeight: this.state.contentLineHeight,
+                  backgroundColor: this.colorChange(this.state.colorIndex),
+                }}>{this.state.bookContent}</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+            <View style={ styles.bottomAd}>
+            <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlBottomContent }}>
 
               </WebView>
             </View>
-            <View style={styles.readContent}>
-
-            </View>
-            <View style={ styles.bottomAd}>
-
-            </View>
             {/* {this.renderBottomModal()} */}
-          </TouchableOpacity>
+          {/* </TouchableOpacity> */}
           {/* <View style={styles.bottomView}> */}
             {/* <TouchableOpacity activeOpacity={0.7} style={styles.menuButton}>
               <Text style={styles.menuText}>目录</Text>
@@ -103,7 +131,8 @@ export default class BookContent extends Component {
                   })
                   
                 }}>
-                  <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text>
+                  <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} />
+                  {/* <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
               <View style={styles.bottomModalView}>
@@ -197,10 +226,10 @@ export default class BookContent extends Component {
                 <View style={styles.wordSizeSet}>
                   <Text style={styles.wordInfoText}>字号</Text>
                   <View style={styles.wordSetButtons}>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.wordMinus}>
+                    <TouchableOpacity onPress={this.wordMinusAction.bind(this)} activeOpacity={0.7} style={styles.wordMinus}>
                       <Text style={styles.wordMinusText}>A-</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.wordAdd}>
+                    <TouchableOpacity onPress={this.wordAddAction.bind(this)}  activeOpacity={0.7} style={styles.wordAdd}>
                       <Text style={styles.wordAddText}>A+</Text>
                     </TouchableOpacity>
                   </View>
@@ -214,6 +243,11 @@ export default class BookContent extends Component {
                     renderItem={({item, index}) => {
                       return <TouchableOpacity onPress={() => {
                         console.log('color index', index)
+                        this.setState({
+                          colorIndex: index
+                        }, () => {
+                            this.updateConfig()
+                        })
                       }} style={[{ backgroundColor: item }, styles.colorButtons]} ></TouchableOpacity>
                     }}
                   />
@@ -232,13 +266,13 @@ export default class BookContent extends Component {
                 <View style={styles.lineButtonViews}>
                   <Text style={styles.lineText}>间距</Text>
                   <View style={styles.lineButtons}>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.largeButton}>
+                    <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 0)} activeOpacity={0.7} style={styles.largeButton}>
                       <Text>变大</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.normalButton}>
+                    <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 1)} activeOpacity={0.7} style={styles.normalButton}>
                       <Text>正常</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.smallButton}>
+                    <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 2)} activeOpacity={0.7} style={styles.smallButton}>
                       <Text>变小</Text>
                     </TouchableOpacity>
                   </View>
@@ -254,7 +288,11 @@ export default class BookContent extends Component {
 
   // request
   requestBookContent() {
-    const { chapterid } = this.state.charterList[this.state.chapterid]
+    if (this.state.charterList == null) {
+      return;
+    }
+    const { chapterid = null } = this.state.charterList[this.state.chapterid] || {}
+
     const data = {
       callback: this.requestBookContentCallback.bind(this),
       chapterid: chapterid,
@@ -268,7 +306,7 @@ export default class BookContent extends Component {
     const { data, state } = res;
     if (state == 1) {
       this.setState({
-        bookContent: data
+        bookContent: data.Content
       })
     }
   }
@@ -330,13 +368,123 @@ export default class BookContent extends Component {
   requestBottomAd() {
     const data = {
       callback: this.requestBottomAdCallback.bind(this),
-      adType: 6
+      adType: 5
     }
     getAd(data)
   }
 
   requestBottomAdCallback(res) {
     console.log('bottomAd', res)
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        bottomUrl: data.Url,
+      })
+    }
+  }
+
+  colorChange(index) {
+    // ['#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
+    switch(index) {
+      case 0:
+        return '#FFFFFF';
+      case 1:
+        return '#EBD3D3'
+      case 2:
+        return '#E4EFE1'
+      case 3:
+        return '#CBECE9'
+      case 4:
+        return '#D4DDEB'
+      case 5:
+        return '#CFB9C2'
+    }
+  }
+
+  wordMinusAction() {
+    this.setState({
+      contentFontSize: this.state.contentFontSize - 1,
+      contentLineHeight: this.state.contentFontSize + 2
+    }, () => {
+        this.updateConfig()
+    })
+    
+  }
+
+  wordAddAction() {
+    this.setState({
+      contentFontSize: this.state.contentFontSize + 1,
+      contentLineHeight: this.state.contentFontSize + 2
+    }, ()=> {
+        this.updateConfig()
+    })
+  }
+
+  lineHeightChangeAction(type) {
+    console.log('lineHeight', type)
+    if (type == 2 && this.state.contentLineHeight < this.state.contentFontSize) {
+      Toast.info("不能再小了！");
+      return;
+    }
+    switch(type) {
+      case 0:
+        this.setState({
+          contentLineHeight: this.state.contentLineHeight + 2
+        }, () => {
+            this.updateConfig()
+        })
+        break;
+      case 1:
+        this.setState({
+          contentLineHeight: this.state.contentFontSize + 2
+        }, () => {
+          this.updateConfig()
+        })
+        break;
+      case 2:
+        this.setState({
+          contentLineHeight: this.state.contentLineHeight - 2
+        }, () => {
+            this.updateConfig()
+        })
+        break;
+    }
+  }
+
+  // 获取配置
+  getLocalConfig() {
+    console.log('getLocalConfig')
+    const data = {
+      callback: this.getLocalConfigCallback.bind(this)
+    }
+    getSetConfig(data)
+      // saveSetConfig,
+  }
+
+  getLocalConfigCallback(res) {
+    const { error, data } = res;
+    console.log('data localconfgi', data)
+    if (error == null) {
+      const {
+        colorIndex = 0,
+        contentFontSize = 16,
+        contentLineHeight = 16,
+      } = data;
+      this.setState({
+        colorIndex: colorIndex,
+        contentFontSize: contentFontSize,
+        contentLineHeight: contentLineHeight
+      })
+    }
+  }
+
+  updateConfig() {
+    const data = {
+      colorIndex: this.state.colorIndex,
+      contentFontSize: this.state.contentFontSize,
+      contentLineHeight: this.state.contentLineHeight
+    }
+    saveSetConfig({ data });
   }
 }
 
@@ -347,12 +495,10 @@ const styles = StyleSheet.create({
   },
   safeView: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
   },
   content: {
     flex: 1,
     // height: '100%',
-    backgroundColor: "#F6F7FB"
   },
   bottomView: {
     height: px(100),
@@ -569,6 +715,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red'
   },
   readContent: {
-    flex: 1
+    flex: 1,
+    paddingVertical: px(20)
   }
 });

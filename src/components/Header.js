@@ -19,7 +19,7 @@ export default class Header extends Component {
         <View style={styles.left}>
           {showBackButton ? (
             <TouchableOpacity style={styles.goBack} onPress={this.goBack.bind(this)}>
-              <Image source={ASSET_IMAGES.ICON_BACK} />
+              <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -69,6 +69,5 @@ const styles = StyleSheet.create({
   goBack: {
     width: px(120),
     height: px(120),
-    backgroundColor: 'red'
   }
 });

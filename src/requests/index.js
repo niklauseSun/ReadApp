@@ -19,7 +19,9 @@ import {
   saveBookContentById,
   saveSearchList,
   getSearchList,
-  clearSearchList
+  clearSearchList,
+  getSetConfig,
+  saveSetConfig,
 } from "./LocalRequest";
 
 export {
@@ -40,5 +42,7 @@ export {
   saveSearchList,
   getSearchList,
   clearSearchList,
-  getAd
+  getAd,
+  getSetConfig,
+  saveSetConfig,
 };
