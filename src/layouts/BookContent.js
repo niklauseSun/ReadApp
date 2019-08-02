@@ -53,7 +53,7 @@ export default class BookContent extends Component {
 
   render() {
 
-    console.log('test', this.props, this.state.contentLineHeight)
+    console.log('test', this.state, this.state.contentLineHeight)
     const htmlContent = `<script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script>`
     const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
     return (
@@ -134,7 +134,7 @@ export default class BookContent extends Component {
                   
                 }}>
                   {/* <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} /> */}
-                  <Header title={this.state.charterList == null ? "" : this.state.charterList[this.state.chapterid].chaptername} showBackButton={true} navigation={this.props.navigation} />
+                  <Header title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterid].chaptername} showBackButton={true} navigation={this.props.navigation} />
                   {/* <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -630,7 +630,6 @@ const styles = StyleSheet.create({
     borderWidth: px(1)
   },
   backgroundSetView: {
-    // backgroundColor: 'red',
     marginTop: px(60),
     flexDirection:'row',
     alignItems: 'center'
@@ -736,7 +735,6 @@ const styles = StyleSheet.create({
   },
   bottomAd: {
     height: px(120),
-    backgroundColor: 'red'
   },
   readContent: {
     flex: 1,

@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
   selectButton: {
     width: px(60),
     height: px(60),
-    // backgroundColor: 'red',
     position: 'relative',
     marginBottom: px(-30),
     marginLeft: px(170),
@@ -153,7 +152,6 @@ const styles = StyleSheet.create({
     borderRadius: px(30),
   },
   selectView: {
-    backgroundColor: 'red',
     width: '100%',
     height: '100%',
     borderRadius: px(30)

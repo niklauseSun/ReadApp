@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
   },
   headBg: {
     height: px(360),
-    backgroundColor: 'red'
   },
   info: {
     marginLeft: px(47),

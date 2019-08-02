@@ -14,7 +14,8 @@ import {
   View,
   Text,
   StatusBar,
-  TouchableOpacity
+  TouchableOpacity,
+  FlatList
 } from "react-native";
 
 import { Header, SearchBar, RankHeadItem, RankItem, AddBookItem } from "../components"
@@ -50,7 +51,6 @@ class Books extends Component {
     this.getFourRankAction();
     this.getFiveRankAction();
     this.getSixRankAction();
-    // this.requestBookIdList();
   }
 
   render() {
@@ -79,27 +79,27 @@ class Books extends Component {
                 <Text style={styles.booksHeadText}>主排行</Text>
 
                 <RankHeadItem
-                  item={mainRankData == null ? {} : mainRankData[0]}
+                  item={mainRankData == null ? {} : mainRankData.length >= 1? mainRankData[0]: {}}
                   navigation={this.props.navigation}
                 />
                 <View style={styles.rankListView}>
                   <View style={styles.rankItems}>
                     <RankItem
-                      item={mainRankData == null ? {} : mainRankData[1]}
+                      item={mainRankData == null ? {} : mainRankData.length >= 2 ? mainRankData[1] : {}}
                       navigation={this.props.navigation}
                     />
                     <RankItem
-                      item={mainRankData == null ? {} : mainRankData[2]}
+                      item={mainRankData == null ? {} : mainRankData.length >= 3 ? mainRankData[2] : {}}
                       navigation={this.props.navigation}
                     />
                   </View>
                   <View style={styles.rankItems}>
                     <RankItem
-                      item={mainRankData == null ? {} : mainRankData[3]}
+                      item={mainRankData == null ? {} : mainRankData.length >= 4 ? mainRankData[3] : {}}
                       navigation={this.props.navigation}
                     />
                     <RankItem
-                      item={mainRankData == null ? {} : mainRankData[4]}
+                      item={mainRankData == null ? {} : mainRankData.length >= 5 ? mainRankData[4] : {}}
                       navigation={this.props.navigation}
                     />
                   </View>
@@ -113,20 +113,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>仙侠</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={subRankData == null ? {} : subRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={subRankData == null ? {} : subRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={subRankData == null ? {} : subRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                  scrollEnabled={false}
+                    data={subRankData}
+                    renderItem={({item, index}) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -141,20 +137,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>修真</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={secondRankData == null ? {} : secondRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={secondRankData == null ? {} : secondRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={secondRankData == null ? {} : secondRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                    scrollEnabled={false}
+                    data={secondRankData}
+                    renderItem={({ item, index }) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -169,20 +161,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>都市</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={thirdRankData == null ? {} : thirdRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={thirdRankData == null ? {} : thirdRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={thirdRankData == null ? {} : thirdRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                    scrollEnabled={false}
+                    data={thirdRankData}
+                    renderItem={({ item, index }) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -197,20 +185,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>穿越</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={fourRankData == null ? {} : fourRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={fourRankData == null ? {} : fourRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={fourRankData == null ? {} : fourRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                    scrollEnabled={false}
+                    data={fourRankData}
+                    renderItem={({ item, index }) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -224,20 +208,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>网游</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={fiveRankData == null ? {} : fiveRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={fiveRankData == null ? {} : fiveRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={fiveRankData == null ? {} : fiveRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                    scrollEnabled={false}
+                    data={fiveRankData}
+                    renderItem={({ item, index }) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -252,20 +232,16 @@ class Books extends Component {
               <View style={styles.predict}>
                 <Text style={styles.predictText}>科幻</Text>
                 <View style={styles.predictContent}>
-                  <AddBookItem
-                    item={sixRankData == null ? {} : sixRankData[0]}
-                    navigation={this.props.navigation}
-                    rate={0}
-                  />
-                  <AddBookItem
-                    item={sixRankData == null ? {} : sixRankData[1]}
-                    navigation={this.props.navigation}
-                    rate={1}
-                  />
-                  <AddBookItem
-                    item={sixRankData == null ? {} : sixRankData[2]}
-                    navigation={this.props.navigation}
-                    rate={2}
+                  <FlatList
+                    scrollEnabled={false}
+                    data={sixRankData}
+                    renderItem={({ item, index }) => {
+                      return <AddBookItem
+                        item={item}
+                        navigation={this.props.navigation}
+                        rate={index}
+                      />
+                    }}
                   />
                 </View>
                 <TouchableOpacity
@@ -288,14 +264,14 @@ class Books extends Component {
     this.props.navigation.navigate("RankList", { rankType: type });
   }
 
-  getMainRankAction() {
+  getMainRankAction = () => {
     const data = {
       callback: this.getMainRankCallback.bind(this)
     };
     getMainRanks(data);
   }
 
-  getSubRankAction() {
+  getSubRankAction = () => {
     const data = {
       callback: this.getSubRankCallback.bind(this),
       type: 1
@@ -303,7 +279,7 @@ class Books extends Component {
     getSubRanks(data);
   }
 
-  getSecondRankAction() {
+getSecondRankAction = () => {
     const data = {
       callback: this.getSecondRandCallback.bind(this),
       type: 2
@@ -311,7 +287,7 @@ class Books extends Component {
     getSubRanks(data);
   }
 
-  getThirdRankAction() {
+  getThirdRankAction = () => {
     const data = {
       callback: this.getThirdRandCallback.bind(this),
       type: 3
@@ -319,7 +295,7 @@ class Books extends Component {
     getSubRanks(data);
   }
 
-  getFourRankAction() {
+  getFourRankAction = () =>  {
     const data = {
       callback: this.getFourRandCallback.bind(this),
       type: 4
@@ -327,7 +303,7 @@ class Books extends Component {
     getSubRanks(data);
   }
 
-  getFiveRankAction() {
+  getFiveRankAction = () => {
     const data = {
       callback: this.getFiveRandCallback.bind(this),
       type: 5
@@ -335,7 +311,7 @@ class Books extends Component {
     getSubRanks(data);
   }
 
-  getSixRankAction() {
+  getSixRankAction = () =>  {
     const data = {
       callback: this.getSixRandCallback.bind(this),
       type: 6

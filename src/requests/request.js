@@ -51,14 +51,12 @@ getRequest = (url, callback = null) => {
     },
     timeout: 60 * 1000
   };
-  
+
   fetch(serverHome + url, opts).then((response) => {
     if (response.ok) {
       return response.json();
     }
   }).then((responseJson) => {
-
-
     if (callback) {
       callback(responseJson);
     }

@@ -45,7 +45,6 @@ export class MenuList extends Component {
                 refreshControl={
                   <RefreshControl
                     title={"Loading"}
-                    colors={["red"]}
                     refreshing={this.state.isRefresh}
                     onRefresh={() => {
                       this._onRefresh();

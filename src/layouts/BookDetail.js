@@ -116,7 +116,7 @@ export default class BookDetail extends Component {
                 style={styles.readButton}
                 onPress={this.goToBookContent.bind(this)}
               >
-                <Text style={styles.readText}>免费试读</Text>
+                <Text style={styles.readText}>免费阅读</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -136,7 +136,10 @@ export default class BookDetail extends Component {
   goToBookContent() {
     console.log("goto book content")
     const { articleid } = this.state.bookDetail
-    this.props.navigation.navigate("BookContent")
+    this.props.navigation.navigate("BookContent", {
+      articleid: articleid,
+      chapterid: 0
+    })
   }
 
   addBookAction() {
@@ -211,7 +214,6 @@ const styles = StyleSheet.create({
   image: {
     height: px(256),
     width: px(171),
-    backgroundColor: "red",
     marginLeft: px(38),
     marginRight: px(54)
   },

@@ -23,7 +23,10 @@ export default class AddBookItem extends Component {
     } = this.props.item || {};
 
     return (
-      <TouchableOpacity onPress={this.goToDetail.bind(this)} style={styles.container}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={this.goToDetail.bind(this)}
+        style={styles.container}>
         {/* <View style={styles.image}>
           <Text>test</Text>
         </View> */}
@@ -35,7 +38,10 @@ export default class AddBookItem extends Component {
             {intro}
           </Text>
           <View style={styles.addButtonView}>
-            <TouchableOpacity onPress={this.requestBookDetail.bind(this)} style={styles.addButton}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={this.requestBookDetail.bind(this)}
+              style={styles.addButton}>
               <Text style={styles.addButtonText}>加入书架</Text>
             </TouchableOpacity>
           </View>
