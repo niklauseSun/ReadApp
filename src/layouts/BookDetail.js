@@ -15,15 +15,18 @@ import { Header, Hud } from '../components';
 import { getBookDetail, saveBookIdList, saveBookDetailList } from "../requests";
 import { Toast } from "@ant-design/react-native";
 import { ASSET_IMAGES } from '../config';
+import {
+  _
+} from 'lodash'
 
 export default class BookDetail extends Component {
 
   constructor(props) {
     super(props);
-    console.log("constructor", props)
-    const { articleid } = props.navigation.state.params || {};
+    const { articleid, chapterid = 0 } = props.navigation.state.params || {};
     this.state = {
       articleid: articleid,
+      chapterid: chapterid,
       bookDetail: null
     };
   }
@@ -127,18 +130,39 @@ export default class BookDetail extends Component {
 
   // method 
   goToMenuList() {
-    console.log('gotomenulist')
     const { articleid } = this.state.bookDetail
     this.props.navigation.navigate("MenuList", { articleid: articleid });
     // getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null})
   }
 
   goToBookContent() {
-    console.log("goto book content")
-    const { articleid } = this.state.bookDetail
+    console.log('gotoContent', this.state.bookDetail, this.state.chapterid)
+    const {
+      articleid
+    } = this.state.bookDetail
+    if (global.bookIdList.indexOf(articleid) == -1) {
+      console.log('test')
+    } else {
+      let testArray = [...global.bookDetailList]
+      let index = _.findIndex(testArray, {
+        'articleid': articleid
+      });
+      // let index = testArray.indexOf(this.props.bookDetail);
+      let tmpArray = this.itemToArrayTop(testArray, index)
+
+      console.log('item temp Array', testArray, indexedDB)
+
+      global.bookDetailList = tmpArray;
+
+      saveBookDetailList({
+        data: global.bookDetailList
+      })
+      DeviceEventEmitter.emit("updateBookListEmit");
+    }
+
     this.props.navigation.navigate("BookContent", {
       articleid: articleid,
-      chapterid: 0
+      chapterid: this.state.chapterid
     })
   }
 
@@ -152,12 +176,9 @@ export default class BookDetail extends Component {
     }
 
     if (global.bookIdList.indexOf(articleid) == -1) {
-      console.log("数据中没有这个数据")
 
       global.bookIdList.push(articleid);
       global.bookDetailList.unshift(data);
-
-      console.log('dddd', global.bookDetailList, global.bookIdList)
       saveBookIdList({data: global.bookIdList })
       saveBookDetailList({data: global.bookDetailList })
       Toast.show("添加成功！")
@@ -181,7 +202,6 @@ export default class BookDetail extends Component {
 
   // callback
   bookDetailCallback(res) {
-    console.log('bookDetail', res)
     const { state, data } = res;
     if (state == 1) {
       this.setState({
@@ -189,6 +209,23 @@ export default class BookDetail extends Component {
       });
       Hud.hidden()
     }
+  }
+
+  itemToArrayTop(Arr, index) {
+    console.log('itemtoArrayTop', Arr, index)
+    let tmp = Arr[index];
+    if (index == 0) {
+      return Arr;
+    }
+    for (let i = 0; i < Arr.length; i++) {
+      if (Arr[i].articleid == Arr[index].articleid) {
+        Arr.splice(i, 1);
+        break;
+      }
+    }
+    tmp.nowDate = new Date();
+    Arr.unshift(tmp);
+    return Arr;
   }
 }
 

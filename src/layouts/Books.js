@@ -63,7 +63,6 @@ class Books extends Component {
       fiveRankData,
       sixRankData
     } = this.state;
-    console.log("mainRankData", mainRankData, subRankData);
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -260,7 +259,6 @@ class Books extends Component {
 
   // private method
   goToRankList(type) {
-    console.log("gotoranklist", type);
     this.props.navigation.navigate("RankList", { rankType: type });
   }
 
@@ -320,7 +318,6 @@ getSecondRankAction = () => {
   }
   // callback
   getMainRankCallback(res) {
-    console.log(res);
     const { state, data } = res;
     if (state == 1) {
       this.setState({
@@ -386,7 +383,7 @@ getSecondRankAction = () => {
   }
 
   goToHistory() {
-    // this.props.navigation.push("")
+    this.props.navigation.navigate('ReadHistory')
   }
 }
 

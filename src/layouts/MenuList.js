@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { getMenuList } from "../requests";
 import { px } from '../utils'
-import { Header } from '../components';
+import { Header, FooterView } from '../components';
 
 export class MenuList extends Component {
     constructor(props) {
@@ -54,19 +54,7 @@ export class MenuList extends Component {
                 onEndReached={this.loadMore.bind(this)}
                 onEndReachedThreshold={0.1}
                 refreshing={this.state.isRefresh}
-                ListFooterComponent={() => {
-                  return (
-                    <View
-                      style={{
-                        height: px(60),
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    >
-                      <Text style={{ color: "#999" }}>没有更多了~</Text>
-                    </View>
-                  );
-                }}
+                ListFooterComponent={() => <FooterView />}
               />
             </SafeAreaView>
           </View>

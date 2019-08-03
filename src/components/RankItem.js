@@ -33,7 +33,6 @@ export default class RankItem extends Component {
   }
 
   goToNext() {
-    console.log('rankItem', this.props)
     const { articleid } = this.props.item || {};
     this.props.navigation.navigate("BookDetail", {
       articleid: articleid

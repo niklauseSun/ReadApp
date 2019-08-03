@@ -17,12 +17,9 @@ import {
   TouchableOpacity,
   Image,
   DeviceEventEmitter,
-  FlatList
+  FlatList,
+  ImageBackground
 } from "react-native";
-
-import {
-  Colors
-} from "react-native/Libraries/NewAppScreen";
 
 import { Header, Line, ReadHistoryItem, SetItem } from "../components"
 import { px } from "../utils"
@@ -56,7 +53,7 @@ class My extends Component {
     return (
       <ScrollView style={styles.container}>
         <StatusBar barStyle="light-content" />
-        <View style={styles.headBg}>
+        <ImageBackground source={ASSET_IMAGES.ICON_MY_SET_BACK_IMAGE} style={styles.headBg}>
           <View style={styles.info}>
             {/* <View style={styles.headImage}>
 
@@ -76,24 +73,26 @@ class My extends Component {
             <Text style={styles.readTime}>阅读{time}分</Text>
             <Text style={styles.readNums}>读过{bookNum}本书</Text>
           </View> */}
-        </View>
+        </ImageBackground>
         <View style={styles.content}>
           {/* 阅读历史 */}
           <View style={styles.history}>
-            <View style={styles.historyHead}>
+            <TouchableOpacity activeOpacity={0.7} onPress={this.gotToHistory.bind(this)} style={styles.historyHead}>
               <Image style={styles.historyImage} source={ASSET_IMAGES.ICON_PERSONAL_HISTORY} />
               <Text style={styles.historyText}>阅读历史</Text>
-            </View>
+              <Image style={styles.moreImage} source={ASSET_IMAGES.ICON_ARROW_RIGHT} />
+            </TouchableOpacity>
             {(this.state.historyList == null || this.state.historyList.length == 0) ?<Text style={{ marginLeft: px(100) }}>暂无数据</Text>:
                 <FlatList
                   // style={{ backgroundColor: 'red', height: px(227)}}
                   data={this.state.historyList}
-                  renderItem={({item}) => {
+                  renderItem={({item, index}) => {
                     console.log('render', item)
                     if (item.type != 1) {
-                      return <ReadHistoryItem item={item} />
+                      return <ReadHistoryItem navigation={this.props.navigation} item={item} index={index} />
                     }
                   }}
+                  ItemSeparatorComponent={() => <Line />}
                 />
             }
             
@@ -142,13 +141,17 @@ class My extends Component {
     // console.log('logout')
   }
 
-  loadHistory = () => {
-    // console.log('history', global.bookDetailList)
-    const detailList = global.bookDetailList.slice(0,2)
+  loadHistory() {
+    const detailList = global.bookDetailList.slice(0,5)
     console.log('detail', detailList);
     this.setState({
       historyList: detailList
     })
+  }
+
+  gotToHistory() {
+    // console.log('gotohistory')
+    this.props.navigation.navigate('ReadHistory');
   }
 }
 
@@ -235,6 +238,7 @@ const styles = StyleSheet.create({
     fontSize: px(36),
     color:'#101010',
     fontWeight: 'bold',
+    flex: 1
   },
   clearCache: {
     marginTop: px(30)
@@ -252,6 +256,11 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: px(36),
     color: '#4ABD76'
+  },
+  moreImage: {
+    width: px(20),
+    height: px(20),
+    marginRight: px(30),
   }
 });
 

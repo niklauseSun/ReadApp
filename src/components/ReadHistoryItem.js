@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity
+} from 'react-native';
 import { px } from "../utils"
 
 export default class ReadHistoryItem extends Component {
@@ -11,16 +16,33 @@ export default class ReadHistoryItem extends Component {
 
   render() {
     const { articlename = "", nowDate = "" } = this.props.item
-    console.log('item', this.props)
     return (
-      <View style={styles.container}>
+      <TouchableOpacity onPress={this.goToBookDetail.bind(this)} style={styles.container}>
         <Text style={styles.titleStyle}>{articlename}</Text>
         <Text style={styles.subStyle}>{new Date(nowDate).toLocaleString()}</Text>
-      </View>
+      </TouchableOpacity>
     );
   }
 
+  goToBookDetail() {
+    const { index = 0 } = this.props;
 
+    if (global.bookDetailList.length != 0) {
+      const bookDetail = global.bookDetailList[index];
+
+      console.log('bookDetail', bookDetail);
+
+      const {
+        charterIndex,
+        articleid
+      } = bookDetail;
+
+      this.props.navigation.navigate("BookDetail", {
+        articleid: articleid,
+        charterid: charterIndex
+      });
+    }
+  }
 }
 
 const styles = StyleSheet.create({

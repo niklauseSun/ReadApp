@@ -16,7 +16,7 @@ import MenuList from '../layouts/MenuList'
 import BookContent from '../layouts/BookContent'
 import RankList from '../layouts/RankList'
 import SearchView from '../layouts/SearchView'
-
+import ReadHistory from '../layouts/ReadHistory'
 
 
 const HomeStack = createStackNavigator({
@@ -49,6 +49,13 @@ const HomeStack = createStackNavigator({
   },
   SearchView: {
     screen: SearchView,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  ReadHistory: {
+    screen: ReadHistory,
     navigationOptions: {
       header: null,
       tabBarVisible: false
@@ -97,6 +104,13 @@ const BookStack = createStackNavigator({
       header: null,
       tabBarVisible: false
     }
+  },
+  ReadHistory: {
+    screen: ReadHistory,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
   }
 });
 
@@ -105,6 +119,27 @@ const SetStack = createStackNavigator({
     screen: My,
     navigationOptions: {
       header: null
+    }
+  },
+  BookDetail: {
+    screen: BookDetail,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  BookContent: {
+    screen: BookContent,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
+    }
+  },
+  ReadHistory: {
+    screen: ReadHistory,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false
     }
   }
 })

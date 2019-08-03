@@ -78,15 +78,10 @@ export default class AddBookItem extends Component {
       ...this.state.bookDetail
     }
 
-    console.log('addBookAction', data)
-
     if (global.bookIdList.indexOf(articleid) == -1) {
-      console.log("数据中没有这个数据")
 
       global.bookIdList.push(articleid);
       global.bookDetailList.unshift(data);
-
-      console.log('dddd', global.bookDetailList, global.bookIdList)
       saveBookIdList({ data: global.bookIdList })
       saveBookDetailList({ data: global.bookDetailList })
       Toast.show("添加成功！")
@@ -110,7 +105,6 @@ export default class AddBookItem extends Component {
 
   // callback
   bookDetailCallback(res) {
-    console.log('bookDetail', res)
     const { state, data } = res;
     if (state == 1) {
       this.setState({

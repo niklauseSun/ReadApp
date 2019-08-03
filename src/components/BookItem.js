@@ -24,7 +24,6 @@ export default class BookItem extends Component {
   }
 
   render() {
-    console.log("bookItem", this.props.item);
     const {
       articlename = "name",
       charterIndex,
@@ -34,8 +33,6 @@ export default class BookItem extends Component {
     } = this.props.item || {};
 
     const { isLongSelect, selectIds } = this.props;
-
-    console.log('isLongSelect',this.props, isLongSelect)
 
     const { index } = this.state;
     // let index = selectIds.indexOf(articleid);
@@ -94,7 +91,6 @@ export default class BookItem extends Component {
 
   onLongAction() {
     const { changeLongSelect } = this.props
-    console.log('longAction')
     changeLongSelect()
   }
 
@@ -102,7 +98,6 @@ export default class BookItem extends Component {
     const { changeSelect, selectIds } = this.props;
     const { articleid } = this.props.item || {};
 
-    console.log('selectBook')
     if (selectIds.indexOf(articleid) > -1) {
       changeSelect(articleid, true)
       

@@ -53,7 +53,6 @@ class Home extends Component {
       dataArray.push({type: 1})
     }
 
-    console.log("render", bookDetailList, dataArray);
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -76,7 +75,6 @@ class Home extends Component {
               extraData={this.state.selectIds}
               data={dataArray}
               renderItem={({ item, index }) => {
-                console.log('item', item)
                 if (item.type == 1) {
                   return <AddItem addBook={this.addBook.bind(this)} />
                 }
@@ -119,7 +117,6 @@ class Home extends Component {
   }
 
   changeLongSelect() {
-    console.log("changeLongSelect");
     this.setState({
       isLongSelect: true
     });
@@ -156,12 +153,10 @@ class Home extends Component {
       // for (let  )
       let lastDetails = _.remove(bookDetailList, (n) => {
         const { articleid } = n;
-        console.log('removes', n, this.state.bookIdList)
         return selectIds.indexOf(articleid) > -1;
       })
 
       const ids = _.difference(this.state.bookIdList, selectIds)
-      console.log('ids', ids, selectIds, this.state.bookDetailList)
 
       this.setState({
         bookIdList: ids,
@@ -170,12 +165,12 @@ class Home extends Component {
       })
       saveBookIdList({ data: ids })
       saveBookDetailList({ data: bookDetailList })
-      // console.log('lastDetails', lastDetails)
+
+      DeviceEventEmitter.emit("updateBookListEmit");
     }
   }
 
   onSearch() {
-    console.log("search", this.props.navigation);
     this.props.navigation.navigate("SearchView");
   }
 
@@ -184,7 +179,7 @@ class Home extends Component {
   }
 
   goToHistory() {
-    console.log("goToHistory")
+    this.props.navigation.navigate('ReadHistory')
   }
 
   requestBookIdList() {
@@ -215,10 +210,8 @@ class Home extends Component {
 
   requestBookListCallback(res) {
     const { error, data } = res;
-    console.log("requestbookdetail", res);
     if (error == null) {
       global.bookDetailList = data || [];
-      console.log("????ddd");
       this.setState({
         bookDetailList: data
       });
@@ -226,7 +219,6 @@ class Home extends Component {
   }
 
   updateBookList() {
-    console.log("updateBookList");
     this.setState({
       bookIdList: global.bookIdList,
       bookDetailList: global.bookDetailList

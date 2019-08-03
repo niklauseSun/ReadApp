@@ -10,7 +10,7 @@ import AddBookItem from './AddBookItem'
 import Hud from './Hud'
 import SearchInputView from "./SearchInputView";
 import AddItem from './AddItem'
-
+import FooterView from './FooterView'
 export {
   Header,
   SearchBar,
@@ -23,5 +23,6 @@ export {
   AddBookItem,
   Hud,
   SearchInputView,
-  AddItem
+  AddItem,
+  FooterView
 };

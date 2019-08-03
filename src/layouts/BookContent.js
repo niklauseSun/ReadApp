@@ -52,8 +52,6 @@ export default class BookContent extends Component {
   }
 
   render() {
-
-    console.log('test', this.state, this.state.contentLineHeight)
     const htmlContent = `<script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script>`
     const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
     return (
@@ -198,16 +196,25 @@ export default class BookContent extends Component {
                 />
                 
               </SafeAreaView>
-              <View style={{ justifyContent: 'center',height:'100%' }}>
-                <TouchableOpacity onPress={() => {
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress = {() => {
                   this.setState({
                     bottomModal: false,
                     menuListModal: false
                   })
-                }}>
+                }}
+              style = {
+                {
+                  justifyContent: 'center',
+                  height: '100%',
+                  width: '20%'
+                }
+              } >
+                <View>
                   <Image source={ASSET_IMAGES.ICON_ARROW_LEFT} />
-                </TouchableOpacity>
-              </View>
+                </View>
+              </TouchableOpacity>
             </View>
               
             </Modal>
@@ -256,7 +263,6 @@ export default class BookContent extends Component {
                     horizontal={true}
                     renderItem={({item, index}) => {
                       return <TouchableOpacity onPress={() => {
-                        console.log('color index', index)
                         this.setState({
                           colorIndex: index
                         }, () => {
@@ -312,7 +318,6 @@ export default class BookContent extends Component {
       chapterid: chapterid,
       articleid: this.state.articleid
     }
-    console.log('request', data)
     getBookContent(data)
   }
 
@@ -350,7 +355,6 @@ export default class BookContent extends Component {
   }
 
   requestFullMenuListCallback(res) {
-    console.log('fullmenu', res)
     const { data, state } = res;
     if (state == 1) {
       this.setState({
@@ -370,7 +374,6 @@ export default class BookContent extends Component {
   }
 
   requestHeadAdCallback(res) {
-    console.log('head add', res)
     const { state, data } = res;
     if (state == 1) {
       this.setState({
@@ -388,7 +391,6 @@ export default class BookContent extends Component {
   }
 
   requestBottomAdCallback(res) {
-    console.log('bottomAd', res)
     const { state, data } = res;
     if (state == 1) {
       this.setState({
@@ -435,7 +437,6 @@ export default class BookContent extends Component {
   }
 
   lineHeightChangeAction(type) {
-    console.log('lineHeight', type)
     if (type == 2 && this.state.contentLineHeight < this.state.contentFontSize) {
       Toast.info("不能再小了！");
       return;
@@ -467,7 +468,6 @@ export default class BookContent extends Component {
 
   // 获取配置
   getLocalConfig() {
-    console.log('getLocalConfig')
     const data = {
       callback: this.getLocalConfigCallback.bind(this)
     }
@@ -477,7 +477,6 @@ export default class BookContent extends Component {
 
   getLocalConfigCallback(res) {
     const { error, data } = res;
-    console.log('data localconfgi', data)
     if (error == null) {
       const {
         colorIndex = 0,

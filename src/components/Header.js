@@ -46,7 +46,8 @@ const styles = StyleSheet.create({
     height: 45,
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "row"
+    flexDirection: "row",
+    backgroundColor: '#F6F7FB'
   },
   titleStyle: {
     fontSize: px(32),
