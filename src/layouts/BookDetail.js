@@ -232,11 +232,11 @@ export default class BookDetail extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#F6F7FB"
   },
   safeView: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#F6F7FB"
   },
   content: {
     flex: 1,

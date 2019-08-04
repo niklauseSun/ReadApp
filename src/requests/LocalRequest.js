@@ -136,7 +136,7 @@ const getSetConfig = ({ callback }) => {
 }
 
 const clearAllCache = () => {
-  global.storage.clearMap()
+  global.storage.clearAll()
 }
 
 export {

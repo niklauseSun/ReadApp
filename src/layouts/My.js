@@ -99,10 +99,10 @@ class My extends Component {
           </View>
           {/* 清除缓存 */}
           <View style={styles.clearCache}>
-            <SetItem img={ASSET_IMAGES.ICON_CLEAN_CACHE} action={this.clearCache} />
+            <SetItem img={ASSET_IMAGES.ICON_CLEAN_CACHE} action={this.clearCache.bind(this)} />
           </View>
           <View style={styles.about}>
-            <SetItem img={ASSET_IMAGES.ICON_ABOUT} title={"关于该阅读APP"}  action={this.gotoAbout}/>
+            <SetItem img={ASSET_IMAGES.ICON_ABOUT} title={"关于该阅读APP"}  action={this.gotoAbout.bind(this)}/>
           </View>
           {/* 关于该阅读APP */}
         </View>
@@ -129,12 +129,17 @@ class My extends Component {
       text: '确定',
       onPress: () => {
         clearAllCache()
+        global.bookDetailList = []
+        global.bookIdList = []
+        Toast.info('数据已清除')
+        DeviceEventEmitter.emit('updateBookListEmit')
       }
     }]);
   }
 
   gotoAbout = () => {
     // console.log('goto about')
+    Toast.info('当前版本是1.1.0')
   }
 
   logout = () => {

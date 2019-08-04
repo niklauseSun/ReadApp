@@ -12,7 +12,7 @@ import {
   saveSetConfig } from '../requests'
 import { WebView } from 'react-native-webview';
 import HTML from 'react-native-render-html'
-import { Header } from '../components'
+import { Header, Hud } from '../components'
 
 const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
 
@@ -72,7 +72,36 @@ export default class BookContent extends Component {
               {/* <HTML html={htmlContent} /> */}
             </View>
           <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
-              <ScrollView style={{ paddingVertical: px(20), paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
+              <ScrollView
+                ref = {
+                  (view) => {
+                    this.myScrollView = view;
+                  }
+                }
+
+                onMomentumScrollEnd={(e) => {
+                  console.log('onScrollEnd')
+                  var offsetY = e.nativeEvent.contentOffset.y; //滑动距离
+                  var contentSizeHeight = e.nativeEvent.contentSize.height; //scrollView contentSize高度
+                  var oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; //scrollView高度
+                  
+                  console.log('onScrollEnd', offsetY, oriageScrollHeight , contentSizeHeight)
+                  if (Math.floor(offsetY + oriageScrollHeight) >= Math.floor(contentSizeHeight)) {
+                    // Console.log('上传滑动到底部事件')
+                    this.setState({
+                      chapterid: this.state.chapterid + 1
+                    }, () => {
+                      this.updateBookDetailList()
+                      // Hud.show()
+                      this.requestBookContent()
+                      this.scrollToTopView()
+                    })
+                    
+                  }
+                  
+                  
+                }}
+                style={{ paddingVertical: px(20), paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
                 <TouchableOpacity
                   activeOpacity={0.9}
                   style={{
@@ -508,6 +537,15 @@ export default class BookContent extends Component {
 
     saveBookDetailList({ data: global.bookDetailList })
     DeviceEventEmitter.emit("updateBookListEmit");
+  }
+
+  scrollToTopView() {
+    this.myScrollView.scrollTo({
+      x: 0,
+      y: 0,
+      animated: true
+    })
+    // Hud.hidden()
   }
 }
 
