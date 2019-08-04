@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter, NativeModules } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import { Slider, Toast } from '@ant-design/react-native'
@@ -40,10 +40,12 @@ export default class BookContent extends Component {
       bookContent: null,
       headUrl:'',
       bottomUrl: null,
+      brightValue: 0.5,
     }
   }
 
   componentDidMount() {
+    this.getBrightAction()
     // this.requestBookContent()
     this.requestMenuList()
     this.requestHeadAd()
@@ -269,7 +271,12 @@ export default class BookContent extends Component {
                 <View style={styles.lightSet}>
                   <Text style={styles.lightSetText}>亮度</Text>
                   <View style={{ flex: 1 }}>
-                    <Slider  />
+                    <Slider onChange={
+                      this.onSliderChange.bind(this)
+                    } value = {
+                      this.state.brightValue
+                    }
+                    />
                   </View>
                   <Image style={styles.lightSetImage} source={ASSET_IMAGES.ICON_BRIGHT} />
                 </View>
@@ -546,6 +553,21 @@ export default class BookContent extends Component {
       animated: true
     })
     // Hud.hidden()
+  }
+
+  getBrightAction() {
+    console.log('nativeModules', NativeModules.BrightModule)
+    NativeModules.BrightModule.getBright((res) => {
+      console.log('birght', res);
+      this.setState({
+        brightValue: res
+      })
+    })
+  }
+
+  onSliderChange(e) {
+    console.log('onSliderChange', e)
+    NativeModules.BrightModule.setBright(e + '')
   }
 }
 

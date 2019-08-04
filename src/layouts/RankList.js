@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, SafeAreaView, StatusBar, FlatList } from "react-native";
 import { getSubRanks } from '../requests'
-import { RankHeadItem, Header } from '../components';
+import { RankHeadItem, Header, FooterView } from '../components';
 import { px } from '../utils';
 
 export default class RankList extends Component {
@@ -36,6 +36,13 @@ export default class RankList extends Component {
             ItemSeparatorComponent={() => {
               return <View style={{ height: px(30)}} />
             }}
+            onEndReached = {
+              this.loadMoreRankListAction.bind(this)
+            }
+            onEndReachedThreshold = {
+              0.1
+            }
+            ListFooterComponent={<FooterView />}
           />
         </SafeAreaView>
       </View>
@@ -52,15 +59,29 @@ export default class RankList extends Component {
     getSubRanks(data)
   }
 
+  loadMoreRankListAction() {
+    const data = {
+      callback: this.getRankListCallback.bind(this),
+      pageSize: 10,
+      type: this.state.rankType,
+      pageIndex: this.state.pageIndex
+    }
+
+    getSubRanks(data)
+  }
+
   getRankListCallback(res) {
     console.log('getRankListCallback', res);
-    const { state, data } = res;
+    const { state, data, page } = res;
     if (state == 1) {
       this.setState({
-        subData: data
+        subData: data,
+        pageIndex: this.state.pageIndex + 1
       })
     }
   }
+
+
 }
 
 const styles = StyleSheet.create({

@@ -3,7 +3,8 @@ import { Hud } from "../components"
 
 // http://wangu.91xiaoapp.com:8081/Api/Article/MainRanks
 
-const serverHome = 'http://wangu.91xiaoapp.com:8081/'
+// const serverHome = 'http://wangu.91xiaoapp.com:8081/'
+const serverHome = 'http://www.yxgxs.com:8081/'
 
 // 书库主排行
 const getMainRanks = ({callback = null}) => {
@@ -12,8 +13,8 @@ const getMainRanks = ({callback = null}) => {
 }
 
 // 书库分类排行榜
-const getSubRanks = ({type, pageSize = 3, callback = null}) => {
-  getRequest(`Api/Article/TypeRanks/${type}?pageSize=${pageSize}`, callback);
+const getSubRanks = ({type, pageSize = 3, callback = null, pageIndex = 1}) => {
+  getRequest(`Api/Article/TypeRanks/${type}?pageSize=${pageSize}&pageIndex=${pageIndex}`, callback);
 }
 
 // 搜索接口

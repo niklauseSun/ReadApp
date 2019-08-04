@@ -16,7 +16,8 @@ import {
   StatusBar,
   FlatList,
   DeviceEventEmitter,
-  TouchableOpacity
+  TouchableOpacity,
+  NativeModules
 } from "react-native";
 
 import { Header, SearchBar, BookItem, AddItem } from "../components"
