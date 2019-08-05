@@ -103,8 +103,12 @@ class Books extends Component {
                     />
                   </View>
                 </View>
-                <TouchableOpacity style={styles.rankListChangeButton}>
-                  <Text style={styles.rankListBtnText}>换一批</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.goToMainRankList()
+                  }}
+                  style={styles.rankListChangeButton}>
+                  <Text style={styles.rankListBtnText}>主排行列表</Text>
                 </TouchableOpacity>
               </View>
 
@@ -260,6 +264,10 @@ class Books extends Component {
   // private method
   goToRankList(type) {
     this.props.navigation.navigate("RankList", { rankType: type });
+  }
+
+  goToMainRankList() {
+    this.props.navigation.navigate("MainRankList");
   }
 
   getMainRankAction = () => {

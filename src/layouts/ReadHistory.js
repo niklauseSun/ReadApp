@@ -33,7 +33,7 @@ export default class ReadHistory extends Component {
   }
 
   componentWillUnmount() {
-    this.subscription = null
+    this.subscription.remove();
   }
 
   render() {

@@ -51,10 +51,6 @@ export default class BookDetail extends Component {
       size
     } = bookDetail
 
-    const htmlStr = `<div style="white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;">${intro}</div>`;
-
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
@@ -150,7 +146,7 @@ export default class BookDetail extends Component {
       // let index = testArray.indexOf(this.props.bookDetail);
       let tmpArray = this.itemToArrayTop(testArray, index)
 
-      console.log('item temp Array', testArray, indexedDB)
+      console.log('item temp Array', testArray, index, global.bookDetailList[index])
 
       global.bookDetailList = tmpArray;
 
@@ -160,9 +156,10 @@ export default class BookDetail extends Component {
       DeviceEventEmitter.emit("updateBookListEmit");
     }
 
+    const { charterIndex = 0 } = global.bookDetailList[0];
     this.props.navigation.navigate("BookContent", {
       articleid: articleid,
-      chapterid: this.state.chapterid
+      chapterid: charterIndex
     })
   }
 

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter, NativeModules } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter, NativeModules, Platform } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import { Slider, Toast } from '@ant-design/react-native'
@@ -11,7 +11,7 @@ import {
   saveBookDetailList,
   saveSetConfig } from '../requests'
 import { WebView } from 'react-native-webview';
-import HTML from 'react-native-render-html'
+import HTML from 'react-native-render-html';
 import { Header, Hud } from '../components'
 
 const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
@@ -54,54 +54,37 @@ export default class BookContent extends Component {
   }
 
   render() {
-    const htmlContent = `<script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script>`
+    const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script></html>`
     const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
+
+    console.log('htmlContent', htmlContent)
     return (
       <View style={[styles.container]}>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
-          {/* <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => {
-            this.setState({
-              bottomModal: !this.state.bottomModal
-            })
-          }} style={styles.content}> */}
             <View style={styles.headAd}>
-              <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlContent}}>
-
+              <WebView
+                style={{ width: '100%', height: '100%' }} source={{ html: htmlContent}}>
               </WebView>
               {/* <HTML html={htmlContent} /> */}
             </View>
           <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
               <ScrollView
-                ref = {
-                  (view) => {
-                    this.myScrollView = view;
-                  }
-                }
-
+                ref = {(view) => { this.myScrollView = view; }}
                 onMomentumScrollEnd={(e) => {
                   console.log('onScrollEnd')
                   var offsetY = e.nativeEvent.contentOffset.y; //滑动距离
                   var contentSizeHeight = e.nativeEvent.contentSize.height; //scrollView contentSize高度
                   var oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; //scrollView高度
-                  
-                  console.log('onScrollEnd', offsetY, oriageScrollHeight , contentSizeHeight)
                   if (Math.floor(offsetY + oriageScrollHeight) >= Math.floor(contentSizeHeight)) {
-                    // Console.log('上传滑动到底部事件')
                     this.setState({
                       chapterid: this.state.chapterid + 1
                     }, () => {
                       this.updateBookDetailList()
-                      // Hud.show()
                       this.requestBookContent()
                       this.scrollToTopView()
                     })
-                    
                   }
-                  
-                  
                 }}
                 style={{ paddingVertical: px(20), paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
                 <TouchableOpacity
@@ -127,23 +110,11 @@ export default class BookContent extends Component {
 
               </WebView>
             </View>
-            {/* {this.renderBottomModal()} */}
-          {/* </TouchableOpacity> */}
-          {/* <View style={styles.bottomView}> */}
-            {/* <TouchableOpacity activeOpacity={0.7} style={styles.menuButton}>
-              <Text style={styles.menuText}>目录</Text>
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7} style={styles.setButton}>
-              <Text style={styles.setText}>设置</Text>
-            </TouchableOpacity> */}
-          {/* </View> */}
           <Modal
             animationType="fade"
             transparent={true}
             visible={this.state.bottomModal}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
+            >
             <SafeAreaView style={styles.modalContent}>
               <TouchableOpacity
                 activeOpacity={1}
@@ -160,11 +131,11 @@ export default class BookContent extends Component {
                   },() => {
                     this.props.navigation.goBack()
                   })
-                  
                 }}>
-                  {/* <Image style={{ width: px(48), height: px(48)}} source={ASSET_IMAGES.ICON_GO_BACK} /> */}
-                  <Header title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterid].chaptername} showBackButton={true} navigation={this.props.navigation} />
-                  {/* <Text style={{ marginLeft: px(30), marginTop: px(20)}}>返回</Text> */}
+                  <Header
+                    title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterid].chaptername}
+                    showBackButton={true}
+                    navigation={this.props.navigation} />
                 </TouchableOpacity>
               </TouchableOpacity>
               <View style={styles.bottomModalView}>
@@ -201,9 +172,7 @@ export default class BookContent extends Component {
             animationType="fade"
             transparent={true}
             visible={this.state.menuListModal}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
+            >
             <View style={{ flexDirection: 'row'}}>
               <SafeAreaView style={{ backgroundColor: '#fff', width: '80%' }}>
                 <FlatList
@@ -211,7 +180,6 @@ export default class BookContent extends Component {
                   renderItem = {({ item, index }) => {
                     return (
                       <TouchableOpacity onPress={() => {
-                        // this.props.navigation.navigate("BookContent")
                         this.setState({
                           chapterid: index,
                           menuListModal: false,
@@ -220,12 +188,12 @@ export default class BookContent extends Component {
                           this.updateBookDetailList()
                         })
                       }} style={styles.itemContent}>
-                        <Text style={styles.chapterName}>{item.chaptername}</Text>
+                        <Text style={[styles.chapterName, { 'color': index == this.state.chapterid ? '#000':"#656E79"
+                        }]}>{item.chaptername}</Text>
                       </TouchableOpacity>
                     );
                   }}
                 />
-                
               </SafeAreaView>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -235,26 +203,23 @@ export default class BookContent extends Component {
                     menuListModal: false
                   })
                 }}
-              style = {
-                {
+                style = {{
                   justifyContent: 'center',
                   height: '100%',
                   width: '20%'
-                }
-              } >
+                }}>
                 <View>
                   <Image source={ASSET_IMAGES.ICON_ARROW_LEFT} />
                 </View>
               </TouchableOpacity>
             </View>
-              
-            </Modal>
+          </Modal>
           <Modal
             animationType="slide"
             transparent={true}
             visible={this.state.setModal}
             onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
+              // Alert.alert('Modal has been closed.');
             }}>
             <SafeAreaView style={styles.modalContent}>
               <TouchableOpacity
@@ -271,11 +236,9 @@ export default class BookContent extends Component {
                 <View style={styles.lightSet}>
                   <Text style={styles.lightSetText}>亮度</Text>
                   <View style={{ flex: 1 }}>
-                    <Slider onChange={
-                      this.onSliderChange.bind(this)
-                    } value = {
-                      this.state.brightValue
-                    }
+                    <Slider 
+                      onChange={ this.onSliderChange.bind(this) } 
+                      value={this.state.brightValue}
                     />
                   </View>
                   <Image style={styles.lightSetImage} source={ASSET_IMAGES.ICON_BRIGHT} />
@@ -295,7 +258,6 @@ export default class BookContent extends Component {
                   <Text style={styles.backgroundText}>背景</Text>
                   <FlatList
                     data={['#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']}
-                    // style={{ backgroundColor: 'blue'}}
                     horizontal={true}
                     renderItem={({item, index}) => {
                       return <TouchableOpacity onPress={() => {
@@ -332,7 +294,6 @@ export default class BookContent extends Component {
                       <Text>变小</Text>
                     </TouchableOpacity>
                   </View>
-                  
                 </View>
               </View>
               </SafeAreaView>
@@ -344,6 +305,8 @@ export default class BookContent extends Component {
 
   // request
   requestBookContent() {
+
+    Hud.show()
     if (this.state.charterList == null) {
       return;
     }
@@ -358,6 +321,7 @@ export default class BookContent extends Component {
   }
 
   requestBookContentCallback(res) {
+    Hud.hidden();
     const { data, state } = res;
     if (state == 1) {
       this.setState({
@@ -436,7 +400,6 @@ export default class BookContent extends Component {
   }
 
   colorChange(index) {
-    // ['#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
     switch(index) {
       case 0:
         return '#FFFFFF';
@@ -508,7 +471,6 @@ export default class BookContent extends Component {
       callback: this.getLocalConfigCallback.bind(this)
     }
     getSetConfig(data)
-      // saveSetConfig,
   }
 
   getLocalConfigCallback(res) {
@@ -552,13 +514,10 @@ export default class BookContent extends Component {
       y: 0,
       animated: true
     })
-    // Hud.hidden()
   }
 
   getBrightAction() {
-    console.log('nativeModules', NativeModules.BrightModule)
     NativeModules.BrightModule.getBright((res) => {
-      console.log('birght', res);
       this.setState({
         brightValue: res
       })
@@ -566,15 +525,16 @@ export default class BookContent extends Component {
   }
 
   onSliderChange(e) {
-    console.log('onSliderChange', e)
-    NativeModules.BrightModule.setBright(e + '')
+    if (Platform.OS =="ios") {
+      NativeModules.BrightModule.setBright(e + '')
+    }
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#F6F7FB"
   },
   safeView: {
     flex: 1,

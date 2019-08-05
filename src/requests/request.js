@@ -7,9 +7,8 @@ import { Hud } from "../components"
 const serverHome = 'http://www.yxgxs.com:8081/'
 
 // 书库主排行
-const getMainRanks = ({callback = null}) => {
-  console.log('getMainRanks')
-  getRequest('Api/Article/MainRanks', callback)
+const getMainRanks = ({callback = null, pageIndex = 1, pageSize = 5}) => {
+  getRequest(`Api/Article/MainRanks?pageIndex=${pageIndex}&pageSize=${pageSize}`, callback)
 }
 
 // 书库分类排行榜
@@ -48,7 +47,9 @@ getRequest = (url, callback = null) => {
   let opts = {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Accept": "application/json",
+      "Content-Type": 'application/json',
+      "Connection": "keep-alive", 
     },
     timeout: 60 * 1000
   };

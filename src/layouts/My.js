@@ -44,7 +44,7 @@ class My extends Component {
   }
 
   componentWillUnmount() {
-    this.subscription = null
+    this.subscription.remove();
   }
 
   render() {

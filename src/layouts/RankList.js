@@ -14,7 +14,7 @@ export default class RankList extends Component {
       rankType: rankType,
       pageIndex: 1,
       pageSize: 10,
-      subData: []
+      subData: [],
     }
   }
 
@@ -53,7 +53,8 @@ export default class RankList extends Component {
     const data = {
       callback: this.getRankListCallback.bind(this),
       pageSize: 10,
-      type: this.state.rankType
+      type: this.state.rankType,
+      pageIndex: 1
     }
 
     getSubRanks(data)
@@ -75,7 +76,7 @@ export default class RankList extends Component {
     const { state, data, page } = res;
     if (state == 1) {
       this.setState({
-        subData: data,
+        subData: [...this.state.subData, ...data],
         pageIndex: this.state.pageIndex + 1
       })
     }
@@ -87,11 +88,11 @@ export default class RankList extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#F6F7FB"
   },
   safeView: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: "#F6F7FB"
   },
   content: {
     flex: 1,

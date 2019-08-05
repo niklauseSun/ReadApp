@@ -17,7 +17,7 @@ import BookContent from '../layouts/BookContent'
 import RankList from '../layouts/RankList'
 import SearchView from '../layouts/SearchView'
 import ReadHistory from '../layouts/ReadHistory'
-
+import MainRankList from '../layouts/MainRankList'
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -110,6 +110,13 @@ const BookStack = createStackNavigator({
     navigationOptions: {
       header: null,
       tabBarVisible: false
+    }
+  },
+  MainRankList: {
+    screen: MainRankList,
+    navigationOptions: {
+      header: null,
+      tabBarVisible: false,
     }
   }
 });
