@@ -45,6 +45,7 @@ export default class BookContent extends Component {
   }
 
   componentDidMount() {
+    Hud.show()
     this.getBrightAction()
     // this.requestBookContent()
     this.requestMenuList()
@@ -81,7 +82,7 @@ export default class BookContent extends Component {
                       chapterid: this.state.chapterid + 1
                     }, () => {
                       this.updateBookDetailList()
-                      this.requestBookContent()
+                      this.requestBookContent(true)
                       this.scrollToTopView()
                     })
                   }
@@ -146,6 +147,7 @@ export default class BookContent extends Component {
                         bottomModal: !this.state.bottomModal,
                         menuListModal: !this.state.menuListModal
                       })
+                      // this.flatList.scrollToIndex({ index: this.state.chapterid})
                     }}
                     activeOpacity={0.7}
                     style={styles.menuButton}>
@@ -176,6 +178,10 @@ export default class BookContent extends Component {
             <View style={{ flexDirection: 'row'}}>
               <SafeAreaView style={{ backgroundColor: '#fff', width: '80%' }}>
                 <FlatList
+                  ref={(view) => { this.flatList = view; }}
+                  onLayout={(e) => {
+                    this.flatList.scrollToIndex({ index: this.state.chapterid })
+                  }}
                   data={this.state.charterList}
                   renderItem = {({ item, index }) => {
                     return (
@@ -184,7 +190,7 @@ export default class BookContent extends Component {
                           chapterid: index,
                           menuListModal: false,
                         }, () => {
-                          this.requestBookContent()
+                          this.requestBookContent(true)
                           this.updateBookDetailList()
                         })
                       }} style={styles.itemContent}>
@@ -304,9 +310,13 @@ export default class BookContent extends Component {
   }
 
   // request
-  requestBookContent() {
+  requestBookContent(showLoading = false) {
 
-    Hud.show()
+    if (showLoading) {
+      Hud.show()
+    }
+
+    
     if (this.state.charterList == null) {
       return;
     }

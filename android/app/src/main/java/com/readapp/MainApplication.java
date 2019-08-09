@@ -9,7 +9,6 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.readapp.NativeModules.BrightPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
 
 
 import java.util.List;
@@ -29,7 +28,6 @@ public class MainApplication extends Application implements ReactApplication {
       // Packages that cannot be autolinked yet can be added manually here, for example:
        packages.add(new RNGestureHandlerPackage());
        packages.add(new BrightPackage());
-//       packages.add(new SplashScreenReactPackage());
       return packages;
     }
 

@@ -117,7 +117,8 @@ class Books extends Component {
                 <Text style={styles.predictText}>仙侠</Text>
                 <View style={styles.predictContent}>
                   <FlatList
-                  scrollEnabled={false}
+                    contentContainerStyle={{flex: 1}}
+                    scrollEnabled={false}
                     data={subRankData}
                     renderItem={({item, index}) => {
                       return <AddBookItem
@@ -141,6 +142,7 @@ class Books extends Component {
                 <Text style={styles.predictText}>修真</Text>
                 <View style={styles.predictContent}>
                   <FlatList
+                    contentContainerStyle={{ flex: 1 }}
                     scrollEnabled={false}
                     data={secondRankData}
                     renderItem={({ item, index }) => {
@@ -165,6 +167,7 @@ class Books extends Component {
                 <Text style={styles.predictText}>都市</Text>
                 <View style={styles.predictContent}>
                   <FlatList
+                    contentContainerStyle={{ flex: 1 }}
                     scrollEnabled={false}
                     data={thirdRankData}
                     renderItem={({ item, index }) => {
@@ -189,6 +192,7 @@ class Books extends Component {
                 <Text style={styles.predictText}>穿越</Text>
                 <View style={styles.predictContent}>
                   <FlatList
+                    contentContainerStyle={{ flex: 1 }}
                     scrollEnabled={false}
                     data={fourRankData}
                     renderItem={({ item, index }) => {
@@ -212,6 +216,7 @@ class Books extends Component {
                 <Text style={styles.predictText}>网游</Text>
                 <View style={styles.predictContent}>
                   <FlatList
+                    contentContainerStyle={{ flex: 1 }}
                     scrollEnabled={false}
                     data={fiveRankData}
                     renderItem={({ item, index }) => {
@@ -236,6 +241,7 @@ class Books extends Component {
                 <Text style={styles.predictText}>科幻</Text>
                 <View style={styles.predictContent}>
                   <FlatList
+                    contentContainerStyle={{ flex: 1 }}
                     scrollEnabled={false}
                     data={sixRankData}
                     renderItem={({ item, index }) => {
@@ -415,9 +421,9 @@ const styles = StyleSheet.create({
   predict: {
     marginTop: px(20),
     width: '100%',
-    height: px(895),
+    // height: px(895),
     backgroundColor: 'white',
-    marginBottom: px(20)
+    marginBottom: px(20),
   },
   booksHeadText: {
     fontSize: px(38),
@@ -451,7 +457,7 @@ const styles = StyleSheet.create({
     color: '#646C75'
   },
   predictContent: {
-    flex: 1
+    flex: 1,
   }
 });
 

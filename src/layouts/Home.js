@@ -17,13 +17,15 @@ import {
   FlatList,
   DeviceEventEmitter,
   TouchableOpacity,
-  NativeModules
+  NativeModules,
+  Modal
 } from "react-native";
 
 import { Header, SearchBar, BookItem, AddItem } from "../components"
 import { px } from '../utils';
-import { getBookList, getBookIdList, saveBookIdList, saveBookDetailList } from '../requests'
+import { getBookList, getBookIdList, saveBookIdList, saveBookDetailList, getAd } from '../requests'
 import { _ } from 'lodash'
+import { WebView } from 'react-native-webview';
 
 class Home extends Component {
   constructor(props) {
@@ -33,11 +35,14 @@ class Home extends Component {
       bookDetailList: [],
       isLongSelect: false,
       selectIds: [],
+      showAd:true,
+      adUrl: null
     };
   }
 
   componentDidMount() {
     this.getAllBookDetailList();
+    this.requestAd();
     // 添加通知消息
     this.subscription = DeviceEventEmitter.addListener(
       "updateBookListEmit",
@@ -45,14 +50,20 @@ class Home extends Component {
     );
   }
 
+  componentWillUnmount() {
+    this.timer && clearTimeout(this.timer);
+  }
+
   render() {
-    const { bookDetailList } = this.state;
+    const { bookDetailList, showAd } = this.state;
 
     let dataArray = bookDetailList
 
     if (dataArray.length == 0 || dataArray[dataArray.length - 1].type != 1) {
       dataArray.push({type: 1})
     }
+
+    const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.adUrl}"></script></html>`
 
     return (
       <View style={styles.container}>
@@ -63,6 +74,21 @@ class Home extends Component {
             rightButtonText={"取消"}
             rightButtonAction={this.cancelDelete.bind(this)}
           />
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={this.state.showAd}
+            >
+              <View style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'red'
+              }}>
+              <WebView 
+                source={{ html: htmlContent }}
+              />
+              </View>
+            </Modal>
           <View style={styles.container}>
             <SearchBar
               onSearch={this.onSearch.bind(this)}
@@ -224,6 +250,30 @@ class Home extends Component {
       bookIdList: global.bookIdList,
       bookDetailList: global.bookDetailList
     });
+  }
+
+  requestAd() {
+    const data = {
+      callback: this.requestAdCallback.bind(this),
+      adType: 1
+    }
+    getAd(data)
+  }
+
+  requestAdCallback(res) {
+    const { state, data } = res;
+    if (state == 1) {
+      this.setState({
+        adUrl: data.Url,
+        showAd: true
+      })
+
+      this.timer = setTimeout(() => {
+        this.setState({
+          showAd: false,
+        })
+      }, 5000)
+    }
   }
 
 }
