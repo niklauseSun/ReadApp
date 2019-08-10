@@ -1,4 +1,5 @@
 package com.readapp.NativeModules;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.provider.Settings;
 import android.view.WindowManager;
@@ -37,11 +38,22 @@ public class BrightModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void setBright(String bright) {
+        float number = Float.parseFloat(bright);
 
-        WindowManager.LayoutParams params = getReactApplicationContext().getCurrentActivity().getWindow().getAttributes();
-        params.screenBrightness = 0.1f;
-        getCurrentActivity().getWindow().setAttributes(params);
-        this.getReactApplicationContext().getCurrentActivity().getWindow().setAttributes(params);
+        final Activity activity = getCurrentActivity();
+        if (activity == null) {
+            return;
+        }
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+                lp.screenBrightness = number *255f;
+                activity.getWindow().setAttributes(lp);
+            }
+        });
+
 //        float number = Float.parseFloat(bright);
 //
 //        WindowManager.LayoutParams lp = this.getReactApplicationContext().getCurrentActivity().getWindow().getAttributes();

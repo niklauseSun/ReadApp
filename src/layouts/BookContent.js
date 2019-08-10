@@ -55,6 +55,18 @@ export default class BookContent extends Component {
   }
 
   render() {
+    const androidContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`
     const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script></html>`
     const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
 
@@ -64,10 +76,21 @@ export default class BookContent extends Component {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
             <View style={styles.headAd}>
-              <WebView
+              {/* <WebView
                 style={{ width: '100%', height: '100%' }} source={{ html: htmlContent}}>
-              </WebView>
-              {/* <HTML html={htmlContent} /> */}
+              </WebView> */}
+            {
+              Platform.OS == "ios" ? <WebView
+                source={{ html: htmlContent }}
+                style={{ width: '100%', height: '100%' }}
+              /> : <WebView
+                  thirdPartyCookiesEnabled={true}
+                  sharedCookiesEnabled={true}
+                  source={{ html: androidContent }}
+                  javaScriptEnabled={true}
+                  injectedJavaScript={`document.write('<script src="${this.state.headUrl}"></script>')`}
+                />
+            }
             </View>
           <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
               <ScrollView
@@ -107,9 +130,21 @@ export default class BookContent extends Component {
               </ScrollView>
             </View>
             <View style={ styles.bottomAd}>
-            <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlBottomContent }}>
+            {
+              Platform.OS == "ios" ? <WebView
+                source={{ html: htmlBottomContent }}
+                style={{ width: '100%', height: '100%' }}
+              /> : <WebView
+                  thirdPartyCookiesEnabled={true}
+                  sharedCookiesEnabled={true}
+                  source={{ html: androidContent }}
+                  javaScriptEnabled={true}
+                  injectedJavaScript={`document.write('<script src="${this.state.bottomUrl}"></script>')`}
+                />
+            }
+            {/* <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlBottomContent }}>
 
-              </WebView>
+              </WebView> */}
             </View>
           <Modal
             animationType="fade"
@@ -535,9 +570,7 @@ export default class BookContent extends Component {
   }
 
   onSliderChange(e) {
-    if (Platform.OS =="ios") {
       NativeModules.BrightModule.setBright(e + '')
-    }
   }
 }
 

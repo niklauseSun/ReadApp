@@ -18,7 +18,8 @@ import {
   DeviceEventEmitter,
   TouchableOpacity,
   NativeModules,
-  Modal
+  Modal,
+  Platform
 } from "react-native";
 
 import { Header, SearchBar, BookItem, AddItem } from "../components"
@@ -63,7 +64,21 @@ class Home extends Component {
       dataArray.push({type: 1})
     }
 
-    const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.adUrl}"></script></html>`
+    const htmlContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`
+
+
+    const iosHtml = `<html><script type="text/javascript" src="${this.state.adUrl}"></script></html>`
 
     return (
       <View style={styles.container}>
@@ -84,9 +99,20 @@ class Home extends Component {
                 height: '100%',
                 backgroundColor: 'red'
               }}>
-              <WebView 
-                source={{ html: htmlContent }}
-              />
+
+              {
+                Platform.OS == "ios" ? <WebView
+                  source={{ html: iosHtml}}
+                  style={{ width: '100%', height: '100%' }}
+                /> : <WebView
+                    thirdPartyCookiesEnabled={true}
+                    sharedCookiesEnabled={true}
+                    source={{ html: htmlContent }}
+                    javaScriptEnabled={true}
+                    injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+                  />
+              }
+              
               </View>
             </Modal>
           <View style={styles.container}>

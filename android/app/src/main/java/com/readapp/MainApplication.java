@@ -1,6 +1,8 @@
 package com.readapp;
 
 import android.app.Application;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -46,5 +48,7 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    WebView.setWebContentsDebuggingEnabled(true);
+    CookieManager.getInstance().setAcceptCookie(true);
   }
 }
