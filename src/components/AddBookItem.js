@@ -19,7 +19,7 @@ export default class AddBookItem extends Component {
     const {
       articlename = "",
       intro = "",
-      image
+      image = null
     } = this.props.item || {};
 
     return (
@@ -30,7 +30,7 @@ export default class AddBookItem extends Component {
         {/* <View style={styles.image}>
           <Text>test</Text>
         </View> */}
-        <Image style={styles.image} source={{ uri: image }} />
+        { image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
         {this.renderTagView()}
         <View style={styles.detail}>
           <Text style={styles.name}>{articlename}</Text>

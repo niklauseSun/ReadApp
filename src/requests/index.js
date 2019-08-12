@@ -23,6 +23,8 @@ import {
   getSetConfig,
   saveSetConfig,
   clearAllCache,
+  getHomeAd,
+  saveHomeAd
 } from "./LocalRequest";
 
 export {
@@ -46,5 +48,7 @@ export {
   getAd,
   getSetConfig,
   saveSetConfig,
-  clearAllCache
+  clearAllCache,
+  getHomeAd,
+  saveHomeAd,
 };

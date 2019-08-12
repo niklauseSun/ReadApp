@@ -21,11 +21,12 @@ export default class BookContent extends Component {
   constructor(props) {
     super(props);
 
-    const { articleid, chapterid } = props.navigation.state.params || {}
+    const { articleid, chapterIndex = 0 } = props.navigation.state.params || {}
 
     this.state = {
       articleid: articleid,
-      chapterid: chapterid,
+      chapterid: null,
+      chapterIndex: chapterIndex,
       menuIndex: 1,
       charterList: null,
       bottomModal: false,
@@ -37,8 +38,8 @@ export default class BookContent extends Component {
       contentBackgroundColor: '#fff',
       contentDirection: true, // true 上下 false 左右
       contentLineHeight: 16,
-      bookContent: null,
-      headUrl:'',
+      bookContent: "",
+      headUrl:null,
       bottomUrl: null,
       brightValue: 0.5,
     }
@@ -49,6 +50,7 @@ export default class BookContent extends Component {
     this.getBrightAction()
     // this.requestBookContent()
     this.requestMenuList()
+    this.requestChapterId();
     this.requestHeadAd()
     this.requestBottomAd()
     this.getLocalConfig()
@@ -83,7 +85,7 @@ export default class BookContent extends Component {
               Platform.OS == "ios" ? <WebView
                 source={{ html: htmlContent }}
                 style={{ width: '100%', height: '100%' }}
-              /> : <WebView
+              /> : this.state.headUrl == null ? null: <WebView
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
@@ -95,22 +97,61 @@ export default class BookContent extends Component {
           <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
               <ScrollView
                 ref = {(view) => { this.myScrollView = view; }}
+                // contentContainerStyle={{ paddingBottom: 20}}
                 onMomentumScrollEnd={(e) => {
                   console.log('onScrollEnd')
                   var offsetY = e.nativeEvent.contentOffset.y; //滑动距离
                   var contentSizeHeight = e.nativeEvent.contentSize.height; //scrollView contentSize高度
                   var oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; //scrollView高度
+                  console.log('onScrollEnd', offsetY);
+                  if (offsetY == 0) {
+                    // 向上移动
+                    if (this.state.charterList == null) {
+                      return;
+                    } else {
+                      if (this.state.chapterIndex > 0) {
+                        const { chapterid } = this.state.charterList[this.state.chapterIndex -1];
+                        this.setState({
+                          chapterid: chapterid,
+                          chapterIndex: this.state.chapterIndex -1
+                        }, () => {
+                          this.updateBookDetailList()
+                          this.requestBookContent(true)
+                          this.scrollToTopView()
+                        })
+                      } else {
+                        // Toast.info('已经是第一章')
+                      }
+                    }
+                  }
                   if (Math.floor(offsetY + oriageScrollHeight) >= Math.floor(contentSizeHeight)) {
-                    this.setState({
-                      chapterid: this.state.chapterid + 1
-                    }, () => {
-                      this.updateBookDetailList()
-                      this.requestBookContent(true)
-                      this.scrollToTopView()
-                    })
+                    if (this.state.charterList == null) {
+                      this.requestMenuList()
+                    } else {
+                      if (this.state.chapterIndex >= this.state.charterList.length - 1) {
+                        Toast.info('已经阅读完毕！')
+                        return;
+                      }
+                      const { chapterid } = this.state.charterList[this.state.chapterIndex + 1]
+                      this.setState({
+                        chapterid: chapterid,
+                        chapterIndex: this.state.chapterIndex + 1
+                      }, () => {
+                        this.updateBookDetailList()
+                        this.requestBookContent(true)
+                        this.scrollToTopView()
+                      })
+                    }
+                    // this.setState({
+                    //   chapterid: this.state.chapterid + 1
+                    // }, () => {
+                    //   this.updateBookDetailList()
+                    //   this.requestBookContent(true)
+                    //   this.scrollToTopView()
+                    // })
                   }
                 }}
-                style={{ paddingVertical: px(20), paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
+                style={{ flex: 1, paddingHorizontal:(20), backgroundColor: this.colorChange(this.state.colorIndex) }}>
                 <TouchableOpacity
                   activeOpacity={0.9}
                   style={{
@@ -125,7 +166,7 @@ export default class BookContent extends Component {
                   fontSize: this.state.contentFontSize,
                   lineHeight: this.state.contentLineHeight,
                   backgroundColor: this.colorChange(this.state.colorIndex),
-                }}>{this.state.bookContent}</Text>
+                }}>{'\n' + this.state.bookContent + '\n'}</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -134,7 +175,7 @@ export default class BookContent extends Component {
               Platform.OS == "ios" ? <WebView
                 source={{ html: htmlBottomContent }}
                 style={{ width: '100%', height: '100%' }}
-              /> : <WebView
+              /> : this.state.bottomUrl == null? null: <WebView
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
@@ -169,7 +210,7 @@ export default class BookContent extends Component {
                   })
                 }}>
                   <Header
-                    title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterid].chaptername}
+                    title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterIndex].chaptername}
                     showBackButton={true}
                     navigation={this.props.navigation} />
                 </TouchableOpacity>
@@ -210,31 +251,46 @@ export default class BookContent extends Component {
             transparent={true}
             visible={this.state.menuListModal}
             >
-            <View style={{ flexDirection: 'row'}}>
-              <SafeAreaView style={{ backgroundColor: '#fff', width: '80%' }}>
-                <FlatList
+            <View style={{ flexDirection: 'row', flex: 1}}>
+              <SafeAreaView style={{ backgroundColor: '#fff', width: '80%',height:'100%' }}>
+              {
+                this.state.charterList == null ? <View style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%'
+                }}>
+                  <Text>加载中...</Text>
+                </View> : <FlatList
                   ref={(view) => { this.flatList = view; }}
                   onLayout={(e) => {
-                    this.flatList.scrollToIndex({ index: this.state.chapterid })
+
+                    if (this.state.charterList != null) {
+                      this.flatList.scrollToIndex({ index: this.state.chapterIndex })
+                    }
                   }}
                   data={this.state.charterList}
-                  renderItem = {({ item, index }) => {
+                  renderItem={({ item, index }) => {
                     return (
                       <TouchableOpacity onPress={() => {
+                        const { chapterid } = item;
+                        console.log('item', item, chapterid)
                         this.setState({
-                          chapterid: index,
+                          chapterIndex: index,
+                          chapterid: chapterid,
                           menuListModal: false,
                         }, () => {
                           this.requestBookContent(true)
                           this.updateBookDetailList()
                         })
                       }} style={styles.itemContent}>
-                        <Text style={[styles.chapterName, { 'color': index == this.state.chapterid ? '#000':"#656E79"
+                        <Text style={[styles.chapterName, {
+                          'color': index == this.state.chapterIndex ? '#000' : "#656E79"
                         }]}>{item.chaptername}</Text>
                       </TouchableOpacity>
                     );
                   }}
                 />
+              }
               </SafeAreaView>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -351,15 +407,9 @@ export default class BookContent extends Component {
       Hud.show()
     }
 
-    
-    if (this.state.charterList == null) {
-      return;
-    }
-    const { chapterid = null } = this.state.charterList[this.state.chapterid] || {}
-
     const data = {
       callback: this.requestBookContentCallback.bind(this),
-      chapterid: chapterid,
+      chapterid: this.state.chapterid,
       articleid: this.state.articleid
     }
     getBookContent(data)
@@ -399,13 +449,41 @@ export default class BookContent extends Component {
     }
   }
 
+  requestChapterId() {
+    console.log('requestChapterId')
+    const pageIndex = Math.floor(this.state.chapterIndex / 10) + 1;
+    const data = {
+      pageIndex: pageIndex,
+      pageSize: 10,
+      articleid: this.state.articleid,
+      callback: this.requestChapterIdCallback.bind(this)
+    }
+    getMenuList(data)
+  }
+
+  requestChapterIdCallback(res) {
+    console.log('res', res)
+    const { data, state } = res;
+    if (state == 1) {
+      console.log('data', this.state.chapterIndex % 10, data[this.state.chapterIndex % 10])
+      const { chapterid = null } = data[this.state.chapterIndex % 10];
+
+      console.log('chapterid', chapterid)
+      if (chapterid != null) {
+        this.setState({
+          chapterid: chapterid
+        }, () => {
+          this.requestBookContent()
+        })
+      }
+    }
+  }
+
   requestFullMenuListCallback(res) {
     const { data, state } = res;
     if (state == 1) {
       this.setState({
         charterList: data,
-      }, () => {
-          this.requestBookContent()
       })
     }
   }
@@ -546,7 +624,7 @@ export default class BookContent extends Component {
   updateBookDetailList() {
     const detail = global.bookDetailList[0];
     detail.nowDate = new Date();
-    detail.charterIndex = this.state.chapterid
+    detail.charterIndex = this.state.chapterIndex
     global.bookDetailList[0] = detail
 
     saveBookDetailList({ data: global.bookDetailList })
@@ -793,14 +871,12 @@ const styles = StyleSheet.create({
   },
   headAd: {
     height: px(120),
-    backgroundColor: 'blue'
   },
   bottomAd: {
     height: px(120),
   },
   readContent: {
     flex: 1,
-    paddingVertical: px(20)
   },
   itemContent: {
     height: px(100),

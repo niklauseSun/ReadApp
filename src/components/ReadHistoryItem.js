@@ -39,7 +39,7 @@ export default class ReadHistoryItem extends Component {
 
       this.props.navigation.navigate("BookDetail", {
         articleid: articleid,
-        charterid: charterIndex
+        charterIndex: charterIndex
       });
     }
   }

@@ -45,7 +45,7 @@ export default class BookDetail extends Component {
     const {
       articlename,
       author,
-      image,
+      image = null,
       intro,
       chapters,
       size
@@ -66,7 +66,7 @@ export default class BookDetail extends Component {
                 {/* <View style={styles.image}>
                   <Text>test</Text>
                 </View> */}
-                <Image source={{ uri: image }} style={styles.image} />
+                {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
                 <View style={styles.headInfo}>
                   <Text style={styles.name}>{articlename}</Text>
                   <Text style={styles.author}>{author}</Text>

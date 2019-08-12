@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { px } from '../utils';
+import { ASSET_IMAGES } from '../config';
 
 export default class RankItem extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ export default class RankItem extends Component {
       >
         {/* <View style={styles.image}> */}
         {/* <Text>test</Text> */}
-        <Image style={styles.image} source={{ uri: image }} />
+        {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
         {/* </View> */}
         <View style={styles.detail}>
           <Text numberOfLines={1} style={styles.name}>

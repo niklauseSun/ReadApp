@@ -92,7 +92,7 @@ class Home extends Component {
           <Modal
             animationType="fade"
             transparent={true}
-            visible={this.state.showAd}
+            visible={this.state.showAd && this.state.adUrl != null}
             >
               <View style={{
                 width: '100%',
@@ -292,6 +292,10 @@ class Home extends Component {
       this.setState({
         adUrl: data.Url,
         showAd: true
+      },() => {
+          this.props.navigation.setParams({
+            tabBarVisible: false
+          })
       })
 
       this.timer = setTimeout(() => {
@@ -300,6 +304,10 @@ class Home extends Component {
         })
       }, 5000)
     }
+  }
+
+  getLocalAd() {
+
   }
 
 }

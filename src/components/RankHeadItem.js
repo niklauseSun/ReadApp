@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { px } from '../utils';
+import { ASSET_IMAGES } from '../config';
 
 export default class RankHeadItem extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class RankHeadItem extends Component {
         onPress={this.gotoBookDetail.bind(this)}
         style={styles.container}
       >
-        <Image style={styles.image} source={{ uri: image }} />
+        {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
         <View style={styles.detail}>
           <Text style={styles.name}>{articlename}</Text>
           <Text style={styles.author}>{author}</Text>

@@ -135,6 +135,52 @@ const getSetConfig = ({ callback }) => {
   })
 }
 
+const getHomeAd = ({ callback }) => {
+  global.storage.load({
+    key: 'homeAd'
+  }).then(ret => {
+    callback({
+      data: ret,
+      error: null
+    })
+  }).catch(err => {
+    callback({
+      error: err,
+      data: null
+    })
+  })
+}
+
+const saveHomeAd = ({ data }) => {
+  global.storage.save({
+    key: 'homeAd',
+    data: data
+  })
+}
+
+const getContentHeadAd = ({ callback }) => {
+  global.storage.load({
+    key: 'contentHeadAd'
+  }).then(ret => {
+    callback({
+      data: ret,
+      error: null
+    })
+  }).catch(err => {
+    callback({
+      error: err,
+      data: null
+    })
+  })
+}
+
+const saveContentHeadAd = ({ data }) => {
+  global.storage.save({
+    key: 'contentHeadAd',
+    data: data
+  })
+}
+
 const clearAllCache = () => {
   global.storage.clearAll()
 }
@@ -154,5 +200,7 @@ export {
   getSetConfig,
   saveSetConfig,
   clearAllCache,
+  getHomeAd,
+  saveHomeAd
 };
 
