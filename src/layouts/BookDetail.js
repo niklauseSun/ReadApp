@@ -156,10 +156,10 @@ export default class BookDetail extends Component {
       DeviceEventEmitter.emit("updateBookListEmit");
     }
 
-    const { charterIndex = 0 } = global.bookDetailList[0];
+    const { chapterIndex = 0 } = global.bookDetailList[0];
     this.props.navigation.navigate("BookContent", {
       articleid: articleid,
-      chapterid: charterIndex
+      chapterIndex: chapterIndex
     })
   }
 
@@ -168,7 +168,7 @@ export default class BookDetail extends Component {
     let nowDate = new Date()
     const data = {
       nowDate: nowDate,
-      charterIndex: 0,
+      chapterIndex: 0,
       ...this.state.bookDetail
     }
 

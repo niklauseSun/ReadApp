@@ -33,13 +33,13 @@ export default class ReadHistoryItem extends Component {
       console.log('bookDetail', bookDetail);
 
       const {
-        charterIndex,
+        chapterIndex,
         articleid
       } = bookDetail;
 
       this.props.navigation.navigate("BookDetail", {
         articleid: articleid,
-        charterIndex: charterIndex
+        chapterIndex: chapterIndex
       });
     }
   }

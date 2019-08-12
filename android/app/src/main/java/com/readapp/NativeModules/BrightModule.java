@@ -2,12 +2,14 @@ package com.readapp.NativeModules;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.yoga.YogaLogger;
 
 import java.util.logging.Handler;
 
@@ -33,13 +35,14 @@ public class BrightModule extends ReactContextBaseJavaModule {
 
         }
 
-        callback.invoke(value / 227);
+        callback.invoke(value / 255f);
     }
 
     @ReactMethod
     public void setBright(String bright) {
         float number = Float.parseFloat(bright);
 
+        Log.d("TEST", String.format("%f", number));
         final Activity activity = getCurrentActivity();
         if (activity == null) {
             return;
@@ -49,7 +52,7 @@ public class BrightModule extends ReactContextBaseJavaModule {
             @Override
             public void run() {
                 WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
-                lp.screenBrightness = number *255f;
+                lp.screenBrightness = number;
                 activity.getWindow().setAttributes(lp);
             }
         });

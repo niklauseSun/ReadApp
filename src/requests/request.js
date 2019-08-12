@@ -50,6 +50,7 @@ getRequest = (url, callback = null) => {
       "Accept": "application/json",
       "Content-Type": 'application/json',
       "Connection": "keep-alive", 
+      "Accept-Encoding":"gzip"
     },
     timeout: 60 * 1000
   };

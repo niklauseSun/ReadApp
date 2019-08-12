@@ -74,7 +74,7 @@ export default class AddBookItem extends Component {
     let nowDate = new Date()
     const data = {
       nowDate: nowDate,
-      charterIndex: 0,
+      chapterIndex: 0,
       ...this.state.bookDetail
     }
 

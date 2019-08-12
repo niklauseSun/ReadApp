@@ -181,6 +181,41 @@ const saveContentHeadAd = ({ data }) => {
   })
 }
 
+const getLocalMenuList = ({ articleid = null, callback }) => {
+
+  if (articleid == null) {
+    callback({
+      error: '无效的articleid',
+      data: null
+    })
+    return;
+  }
+  global.storage.load({
+    key: 'menuList' + articleid
+  }).then(ret => {
+    callback({
+      data: ret,
+      error: null
+    })
+  }).catch(err => {
+    callback({
+      error: err,
+      data: null
+    })
+  })
+}
+
+const saveLocalMenuList = ({ articleid, menuList }) => {
+  if (articleid == null) {
+    return;
+  }
+
+  global.storage.save({
+    key: 'menuList' + articleid,
+    data: menuList
+  })
+}
+
 const clearAllCache = () => {
   global.storage.clearAll()
 }
@@ -201,6 +236,8 @@ export {
   saveSetConfig,
   clearAllCache,
   getHomeAd,
-  saveHomeAd
+  saveHomeAd,
+  saveLocalMenuList,
+  getLocalMenuList
 };
 

@@ -26,7 +26,7 @@ export default class BookItem extends Component {
   render() {
     const {
       articlename = "name",
-      charterIndex,
+      chapterIndex,
       chapters,
       image = null,
       articleid
@@ -59,7 +59,7 @@ export default class BookItem extends Component {
             {articlename}
           </Text>
           <Text style={styles.subTitle}>
-            还剩{chapters - charterIndex}章未读
+            还剩{chapters - chapterIndex}章未读
           </Text>
         </View>
       </TouchableOpacity>
@@ -78,13 +78,13 @@ export default class BookItem extends Component {
       DeviceEventEmitter.emit("updateBookListEmit");
 
       const {
-        charterIndex,
+        chapterIndex,
         articleid
       } = this.props.item
 
       this.props.navigation.navigate("BookContent", {
         articleid: articleid,
-        charterIndex: charterIndex
+        chapterIndex: chapterIndex
       });
     }
   }

@@ -62,10 +62,16 @@ export class MenuList extends Component {
     }
 
     // render
-    renderItem = ({ item }) => {
+    renderItem = ({ item, index }) => {
       return (
         <TouchableOpacity onPress={() => {
-          this.props.navigation.navigate("BookContent")
+          console.log('item', item, index)
+          const { chaptername, articleid } = item
+          this.props.navigation.navigate("BookContent", {
+            articleid: articleid,
+            chapterIndex: index,
+            chapterName: chaptername
+          })
         }} style={styles.itemContent}>
           <Text style={styles.chapterName}>{item.chaptername}</Text>
         </TouchableOpacity>

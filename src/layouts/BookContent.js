@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter, NativeModules, Platform } from "react-native";
+import { Text, View, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Image, FlatList, ScrollView, DeviceEventEmitter, NativeModules, Platform, Dimensions } from "react-native";
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import { Slider, Toast } from '@ant-design/react-native'
@@ -9,9 +9,10 @@ import {
   getAd,
   getSetConfig,
   saveBookDetailList,
-  saveSetConfig } from '../requests'
+  saveSetConfig, 
+  saveLocalMenuList,
+  getLocalMenuList} from '../requests'
 import { WebView } from 'react-native-webview';
-import HTML from 'react-native-render-html';
 import { Header, Hud } from '../components'
 
 const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
@@ -21,7 +22,7 @@ export default class BookContent extends Component {
   constructor(props) {
     super(props);
 
-    const { articleid, chapterIndex = 0 } = props.navigation.state.params || {}
+    const { articleid, chapterIndex = 0, chapterName="" } = props.navigation.state.params || {}
 
     this.state = {
       articleid: articleid,
@@ -42,6 +43,7 @@ export default class BookContent extends Component {
       headUrl:null,
       bottomUrl: null,
       brightValue: 0.5,
+      chapterName: chapterName
     }
   }
 
@@ -49,6 +51,7 @@ export default class BookContent extends Component {
     Hud.show()
     this.getBrightAction()
     // this.requestBookContent()
+    this.requestLocalMenuList()
     this.requestMenuList()
     this.requestChapterId();
     this.requestHeadAd()
@@ -110,9 +113,10 @@ export default class BookContent extends Component {
                       return;
                     } else {
                       if (this.state.chapterIndex > 0) {
-                        const { chapterid } = this.state.charterList[this.state.chapterIndex -1];
+                        const { chapterid, chaptername } = this.state.charterList[this.state.chapterIndex -1];
                         this.setState({
                           chapterid: chapterid,
+                          chapterName: chaptername,
                           chapterIndex: this.state.chapterIndex -1
                         }, () => {
                           this.updateBookDetailList()
@@ -126,15 +130,17 @@ export default class BookContent extends Component {
                   }
                   if (Math.floor(offsetY + oriageScrollHeight) >= Math.floor(contentSizeHeight)) {
                     if (this.state.charterList == null) {
-                      this.requestMenuList()
+                      // this.requestMenuList()
+                      Toast.info("数据加载中！请稍后重试！")
                     } else {
                       if (this.state.chapterIndex >= this.state.charterList.length - 1) {
                         Toast.info('已经阅读完毕！')
                         return;
                       }
-                      const { chapterid } = this.state.charterList[this.state.chapterIndex + 1]
+                      const { chapterid, chaptername } = this.state.charterList[this.state.chapterIndex + 1]
                       this.setState({
                         chapterid: chapterid,
+                        chapterName: chaptername,
                         chapterIndex: this.state.chapterIndex + 1
                       }, () => {
                         this.updateBookDetailList()
@@ -210,7 +216,7 @@ export default class BookContent extends Component {
                   })
                 }}>
                   <Header
-                    title={this.state.charterList == null || this.state.charterList.length == 0 ? "" : this.state.charterList[this.state.chapterIndex].chaptername}
+                    title={this.state.chapterName}
                     showBackButton={true}
                     navigation={this.props.navigation} />
                 </TouchableOpacity>
@@ -246,6 +252,9 @@ export default class BookContent extends Component {
               </View>
             </SafeAreaView>
           </Modal>
+
+          {/* 目录 */}
+
           <Modal
             animationType="fade"
             transparent={true}
@@ -262,25 +271,26 @@ export default class BookContent extends Component {
                   <Text>加载中...</Text>
                 </View> : <FlatList
                   ref={(view) => { this.flatList = view; }}
-                  onLayout={(e) => {
-
-                    if (this.state.charterList != null) {
-                      this.flatList.scrollToIndex({ index: this.state.chapterIndex })
-                    }
-                  }}
+                  initialScrollIndex={this.state.chapterIndex}
+                  getItemLayout={(data, index) => (
+                    { length: px(100), offset: px(100) * index, index }
+                  )}
                   data={this.state.charterList}
                   renderItem={({ item, index }) => {
                     return (
                       <TouchableOpacity onPress={() => {
-                        const { chapterid } = item;
+                        const { chapterid, chaptername } = item;
                         console.log('item', item, chapterid)
                         this.setState({
                           chapterIndex: index,
                           chapterid: chapterid,
                           menuListModal: false,
+                          chapterName: chaptername
                         }, () => {
-                          this.requestBookContent(true)
-                          this.updateBookDetailList()
+                            console.log('updateBookDetailList')
+                            this.scrollToTopView()
+                            this.requestBookContent(true)
+                            this.updateBookDetailList()
                         })
                       }} style={styles.itemContent}>
                         <Text style={[styles.chapterName, {
@@ -311,6 +321,8 @@ export default class BookContent extends Component {
               </TouchableOpacity>
             </View>
           </Modal>
+
+          {/* 设置 */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -466,12 +478,13 @@ export default class BookContent extends Component {
     const { data, state } = res;
     if (state == 1) {
       console.log('data', this.state.chapterIndex % 10, data[this.state.chapterIndex % 10])
-      const { chapterid = null } = data[this.state.chapterIndex % 10];
+      const { chapterid = null, chaptername = "" } = data[this.state.chapterIndex % 10];
 
       console.log('chapterid', chapterid)
       if (chapterid != null) {
         this.setState({
-          chapterid: chapterid
+          chapterid: chapterid,
+          chapterName: chaptername
         }, () => {
           this.requestBookContent()
         })
@@ -482,6 +495,29 @@ export default class BookContent extends Component {
   requestFullMenuListCallback(res) {
     const { data, state } = res;
     if (state == 1) {
+      this.setState({
+        charterList: data,
+      })
+
+      saveLocalMenuList({
+        articleid: this.state.articleid,
+        menuList: data
+      })
+    }
+  }
+
+  requestLocalMenuList() {
+    const data = {
+      articleid: this.state.articleid,
+      callback: this.requestLocalMenuListCallback.bind(this)
+    }
+
+    getLocalMenuList(data)
+  }
+
+  requestLocalMenuListCallback(res) {
+    const { error, data } = res;
+    if (error == null) {
       this.setState({
         charterList: data,
       })
@@ -624,8 +660,10 @@ export default class BookContent extends Component {
   updateBookDetailList() {
     const detail = global.bookDetailList[0];
     detail.nowDate = new Date();
-    detail.charterIndex = this.state.chapterIndex
+    detail.chapterIndex = this.state.chapterIndex
     global.bookDetailList[0] = detail
+
+    console.log('global', global.bookDetailList)
 
     saveBookDetailList({ data: global.bookDetailList })
     DeviceEventEmitter.emit("updateBookListEmit");
@@ -635,7 +673,7 @@ export default class BookContent extends Component {
     this.myScrollView.scrollTo({
       x: 0,
       y: 0,
-      animated: true
+      animated: false
     })
   }
 
