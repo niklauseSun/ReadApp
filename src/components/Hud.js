@@ -9,6 +9,7 @@ let sibling = undefined;
 const HUD = {
 
   show: () => {
+    console.log('showHud', sibling)
     sibling = new RootSiblings(
       <View style={styles.maskStyle}>
         <View style={styles.backViewStyle}>

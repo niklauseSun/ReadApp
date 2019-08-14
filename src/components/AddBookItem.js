@@ -6,6 +6,8 @@ import { Toast } from '@ant-design/react-native'
 import { saveBookIdList, saveBookDetailList, getBookDetail } from '../requests'
 import { Hud } from '../components'
 
+import { _ } from 'lodash'
+
 export default class AddBookItem extends Component {
   constructor(props) {
     super(props);
@@ -71,25 +73,43 @@ export default class AddBookItem extends Component {
 
   addBookAction() {
     const { articleid } = this.state.bookDetail;
-    let nowDate = new Date()
-    const data = {
-      nowDate: nowDate,
-      chapterIndex: 0,
-      ...this.state.bookDetail
-    }
 
-    if (global.bookIdList.indexOf(articleid) == -1) {
+    let testArray = [...global.bookDetailList]
+    let index = _.findIndex(testArray, {
+      'articleid': articleid
+    });
 
-      global.bookIdList.push(articleid);
+    if (index == -1) {
+      let nowDate = new Date()
+      const data = {
+        nowDate: nowDate,
+        chapterIndex: 0,
+        isAdded: true,
+        ...this.state.bookDetail
+      }
+
       global.bookDetailList.unshift(data);
-      saveBookIdList({ data: global.bookIdList })
       saveBookDetailList({ data: global.bookDetailList })
       Toast.show("添加成功！")
       DeviceEventEmitter.emit("updateBookListEmit");
     } else {
-      Toast.show("本书已添加到书库中！")
-    }
 
+      if (global.bookDetailList[index].isAdded) {
+        Toast.show("本书已添加到书库中！")
+      } else {
+        let tmpArray = this.itemToArrayTop(testArray, index)
+        global.bookDetailList = tmpArray;
+
+        let nowDate = new Date()
+        global.bookDetailList[0].nowDate = nowDate,
+          global.bookDetailList[0].isAdded = true
+
+        saveBookDetailList({
+          data: global.bookDetailList
+        })
+        DeviceEventEmitter.emit("updateBookListEmit");
+      }
+    }
   }
 
   // request

@@ -9,7 +9,7 @@ import {
   FlatList,
   TouchableOpacity
 } from "react-native";
-import { SearchInputView, Header, RankHeadItem } from '../components';
+import { SearchInputView, Header, RankHeadItem, FooterView } from '../components';
 import { px } from '../utils'
 import { ASSET_IMAGES } from '../config';
 import {
@@ -47,6 +47,7 @@ export default class SearchView extends Component {
               onSearchAction={this.onSearchAction.bind(this)}
               onCancel={this.onCancel.bind(this)}
               onChangeText={this.onChangeText.bind(this)}
+              value={this.state.searchWord || ""}
               />
               {this.state.searchWord == null || this.state.searchWord.length == 0 ? this.renderHistory(this.state.historyList): 
               this.renderSearchResult(this.state.searchResultList)}
@@ -61,7 +62,7 @@ export default class SearchView extends Component {
 
   renderHistory = (historyList) => {
     return (
-      <Fragment>
+      <View style={{ flex: 1}}>
         <View style={styles.historyHead}>
           <Text style={styles.historyHeadText}>搜索历史</Text>
           <TouchableOpacity onPress={this.deleteHistory.bind(this)}>
@@ -72,6 +73,7 @@ export default class SearchView extends Component {
           </TouchableOpacity>
         </View>
         <FlatList
+          style={{ marginTop: px(30), paddingTop: px(30) }}
           data={historyList}
           renderItem={({ item }) => {
             return (
@@ -87,15 +89,15 @@ export default class SearchView extends Component {
           }}
           numColumns={3}
         />
-      </Fragment>
+      </View>
     );
   }
 
   renderSearchResult = (searchResultList) => {
     return (
-      <Fragment>
+      <View style={{ flex: 1 }}>
         <FlatList
-          style={{marginTop: px(30), backgroundColor: '#fff'}}
+          style={{marginTop: px(30) }}
           data={searchResultList}
           renderItem={({ item }) => {
             return <RankHeadItem item={item} navigation={this.props.navigation} />
@@ -109,8 +111,11 @@ export default class SearchView extends Component {
               <View style={{ width: '100%', alignItems: 'center', justifyContent: 'center', height: px(60)}}><Text style={{ color: '#999'}}>暂无数据</Text></View>
             )
           }}
+          onEndReached={this.loadMoreSearchList.bind(this)}
+          onEndReachedThreshold = {0.1}
+          ListFooterComponent={<FooterView />}
         />
-      </Fragment>
+      </View>
     )
   }
 
@@ -121,11 +126,16 @@ export default class SearchView extends Component {
 
   addToSearch(item) {
     console.log('addToSearch', item)
+    this.setState({
+      searchWord: item
+    }, () => {
+      this.onSearchAction()
+    })
   }
 
   onSearchAction() {
     console.log('search 111',this.state.searchWord)
-    if (this.state.searchWord == null || this.state.searchWord.length == 0) {
+    if (this.state.searchWord == null || this.state.searchWord.length == 0 || this.state.searchWord.trim().length == 0) {
       return;
     }
     console.log('test')
@@ -168,14 +178,23 @@ export default class SearchView extends Component {
   requestSearchList() {
     const data = {
       callback: this.requestSearchListCallback.bind(this),
-      keyword: this.state.searchWord
+      keyword: this.state.searchWord,
+      pageIndex: this.state.pageIndex,
+      pageSize: 10
     }
 
-    getSearchResult(data)
+    getSearchResult(data);
   }
 
   loadMoreSearchList() {
+    const data = {
+      callback: this.loadMoreResultCallback.bind(this),
+      keyword: this.state.keyword,
+      pageIndex: this.state.pageIndex,
+      pageSize: 10
+    }
 
+    getSearchResult(data);
   }
 
   requestSearchListCallback(res) {
@@ -196,11 +215,41 @@ export default class SearchView extends Component {
       } else {
         this.setState({
           searchResultList: data,
+          pageIndex: this.state.pageIndex + 1,
           historyList: [this.state.searchWord, ...historyList]
         }, ()=> {
             saveSearchList({
               data: this.state.historyList
             })
+        })
+      }
+    }
+  }
+
+  loadMoreResultCallback(res) {
+    const { data, state } =res;
+
+    if (state == 1) {
+      const { historyList = [] } = this.state;
+      if (historyList.indexOf(this.state.searchWord) > -1) {
+        let index = historyList.indexOf(this.state.searchWord)
+        let tmpArray = this.itemToArrayTop(historyList, index)
+        this.setState({
+          searchResultList: data,
+          historyList: tmpArray
+        })
+        saveSearchList({
+          data: tmpArray
+        })
+      } else {
+        this.setState({
+          searchResultList: [...this.state.searchResultList, ...data],
+          pageIndex: this.state.pageIndex + 1,
+          historyList: [this.state.searchWord, ...historyList]
+        }, () => {
+          saveSearchList({
+            data: this.state.historyList
+          })
         })
       }
     }
@@ -238,7 +287,7 @@ const styles = StyleSheet.create({
   historyHead: {
     height: px(90),
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   historyHeadText: {
     fontSize: px(38),

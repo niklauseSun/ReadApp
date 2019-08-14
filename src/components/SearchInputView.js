@@ -10,7 +10,8 @@ export default class SearchInputView extends Component {
   }
 
   render() {
-    const { onCancel, onSearchAction, onChangeText } = this.props;
+    const { onCancel, onSearchAction, onChangeText, value } = this.props;
+    console.log('testsss', value)
     return (
       <View style={styles.container}>
         <View style={styles.inputContent}>
@@ -23,6 +24,7 @@ export default class SearchInputView extends Component {
             onSubmitEditing={onSearchAction}
             onChangeText={onChangeText}
             clearButtonMode={"while-editing"}
+            value={value}
           />
         </View>
         <TouchableOpacity activeOpacity={0.7} onPress={onCancel}>

@@ -23,16 +23,20 @@ export default class BookDetail extends Component {
 
   constructor(props) {
     super(props);
-    const { articleid, chapterid = 0 } = props.navigation.state.params || {};
+    const { articleid, chapterIndex = 0 } = props.navigation.state.params || {};
     this.state = {
       articleid: articleid,
-      chapterid: chapterid,
+      chapterIndex: chapterIndex,
       bookDetail: null
     };
   }
 
   componentDidMount() {
     this.requestBookDetail()
+  }
+
+  componentWillUnmount() {
+    Hud.hidden();
   }
 
   render() {
@@ -132,59 +136,111 @@ export default class BookDetail extends Component {
   }
 
   goToBookContent() {
-    console.log('gotoContent', this.state.bookDetail, this.state.chapterid)
+    console.log('gotoContent', this.state.bookDetail, this.state.chapterIndex)
     const {
       articleid
     } = this.state.bookDetail
-    if (global.bookIdList.indexOf(articleid) == -1) {
-      console.log('test')
-    } else {
+    // if (global.bookIdList.indexOf(articleid) == -1) {
+    //   console.log('test')
+    // } else {
       let testArray = [...global.bookDetailList]
       let index = _.findIndex(testArray, {
         'articleid': articleid
       });
-      // let index = testArray.indexOf(this.props.bookDetail);
-      let tmpArray = this.itemToArrayTop(testArray, index)
 
-      console.log('item temp Array', testArray, index, global.bookDetailList[index])
+      console.log('index', index)
 
-      global.bookDetailList = tmpArray;
+      if (index == -1) {
+        // 未添加
+        let nowDate = new Date();
+        const data = {
+          nowDate: nowDate,
+          chapterIndex: 0,
+          isAdded: false,
+          ...this.state.bookDetail
+        }
 
-      saveBookDetailList({
-        data: global.bookDetailList
-      })
-      DeviceEventEmitter.emit("updateBookListEmit");
-    }
+        global.bookDetailList.unshift(data);
+        saveBookDetailList({ data: global.bookDetailList })
+        // Toast.show("添加成功！")
+        DeviceEventEmitter.emit("updateBookListEmit");
+      } else {
+        let tmpArray = this.itemToArrayTop(testArray, index)
+        global.bookDetailList = tmpArray;
+        saveBookDetailList({
+          data: global.bookDetailList
+        })
+        DeviceEventEmitter.emit("updateBookListEmit");
+      }
 
-    const { chapterIndex = 0 } = global.bookDetailList[0];
-    this.props.navigation.navigate("BookContent", {
-      articleid: articleid,
-      chapterIndex: chapterIndex
-    })
+      const { chapterIndex = 0 } = global.bookDetailList[0];
+      this.props.navigation.navigate("BookContent", {
+        articleid: articleid,
+        chapterIndex: chapterIndex
+      })    
   }
 
   addBookAction() {
     const { articleid } = this.state.bookDetail;
-    let nowDate = new Date()
-    const data = {
-      nowDate: nowDate,
-      chapterIndex: 0,
-      ...this.state.bookDetail
-    }
 
-    if (global.bookIdList.indexOf(articleid) == -1) {
+    let testArray = [...global.bookDetailList]
+    let index = _.findIndex(testArray, {
+      'articleid': articleid
+    });
 
-      global.bookIdList.push(articleid);
+    if (index == -1) {
+      let nowDate = new Date()
+      const data = {
+        nowDate: nowDate,
+        chapterIndex: 0,
+        isAdded: true,
+        ...this.state.bookDetail
+      }
+
       global.bookDetailList.unshift(data);
-      saveBookIdList({data: global.bookIdList })
-      saveBookDetailList({data: global.bookDetailList })
+      saveBookDetailList({ data: global.bookDetailList })
       Toast.show("添加成功！")
       DeviceEventEmitter.emit("updateBookListEmit");
     } else {
-      Toast.show("本书已添加到书库中！")
-    }
 
+      if (global.bookDetailList[index].isAdded) {
+        Toast.show("本书已添加到书库中！")
+      } else {
+        let tmpArray = this.itemToArrayTop(testArray, index)
+        global.bookDetailList = tmpArray;
+
+        let nowDate = new Date()
+        global.bookDetailList[0].nowDate = nowDate,
+        global.bookDetailList[0].isAdded = true
+
+        saveBookDetailList({
+          data: global.bookDetailList
+        })
+        DeviceEventEmitter.emit("updateBookListEmit");
+      }
+    }
   }
+
+    // let nowDate = new Date()
+    // const data = {
+    //   nowDate: nowDate,
+    //   chapterIndex: 0,
+    //   ...this.state.bookDetail
+    // }
+
+    // if (global.bookIdList.indexOf(articleid) == -1) {
+
+    //   global.bookIdList.push(articleid);
+    //   global.bookDetailList.unshift(data);
+    //   saveBookIdList({data: global.bookIdList })
+    //   saveBookDetailList({data: global.bookDetailList })
+    //   Toast.show("添加成功！")
+    //   DeviceEventEmitter.emit("updateBookListEmit");
+    // } else {
+    //   Toast.show("本书已添加到书库中！")
+    // }
+
+  // }
 
 
   // request

@@ -28,6 +28,7 @@ import { getBookList, getBookIdList, saveBookIdList, saveBookDetailList, getAd }
 import { _ } from 'lodash'
 import { WebView } from 'react-native-webview';
 
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -53,6 +54,7 @@ class Home extends Component {
 
   componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
+    this.subscription.remove()
   }
 
   render() {
@@ -92,19 +94,18 @@ class Home extends Component {
           <Modal
             animationType="fade"
             transparent={true}
-            visible={this.state.showAd && this.state.adUrl != null}
+            visible={this.state.showAd}
             >
-              <View style={{
-                width: '100%',
+              <SafeAreaView style={{
                 height: '100%',
-                backgroundColor: 'red'
+                width: '100%'
               }}>
 
               {
                 Platform.OS == "ios" ? <WebView
                   source={{ html: iosHtml}}
                   style={{ width: '100%', height: '100%' }}
-                /> : <WebView
+                /> : this.state.adUrl == null ? null : <WebView
                     thirdPartyCookiesEnabled={true}
                     sharedCookiesEnabled={true}
                     source={{ html: htmlContent }}
@@ -113,7 +114,7 @@ class Home extends Component {
                   />
               }
               
-              </View>
+              </SafeAreaView>
             </Modal>
           <View style={styles.container}>
             <SearchBar
@@ -159,13 +160,9 @@ class Home extends Component {
     );
   }
 
-  componentWillUnmount() {
-    this.subscription.remove();
-  }
-
   // action
   getAllBookDetailList() {
-    this.requestBookIdList();
+    // this.requestBookIdList();
     this.requestBookList();
   }
 
@@ -212,11 +209,9 @@ class Home extends Component {
       const ids = _.difference(this.state.bookIdList, selectIds)
 
       this.setState({
-        bookIdList: ids,
-        bookDetailList: bookDetailList,
+        bookDetailList: lastDetails,
         isLongSelect: false
       })
-      saveBookIdList({ data: ids })
       saveBookDetailList({ data: bookDetailList })
 
       DeviceEventEmitter.emit("updateBookListEmit");
@@ -265,16 +260,26 @@ class Home extends Component {
     const { error, data } = res;
     if (error == null) {
       global.bookDetailList = data || [];
+
+      let tmpArray = global.bookDetailList.filter((item) => {
+        return item.isAdded;
+      })
+
+      console.log('tmpArray', tmpArray)
+
       this.setState({
-        bookDetailList: data
+        bookDetailList: tmpArray
       });
     }
   }
 
   updateBookList() {
+    let tmpArray = global.bookDetailList.filter((item) => {
+      return item.isAdded;
+    })
     this.setState({
-      bookIdList: global.bookIdList,
-      bookDetailList: global.bookDetailList
+      // bookIdList: global.bookIdList,
+      bookDetailList: tmpArray
     });
   }
 
@@ -289,20 +294,21 @@ class Home extends Component {
   requestAdCallback(res) {
     const { state, data } = res;
     if (state == 1) {
+      const { Url= null} = data;
       this.setState({
-        adUrl: data.Url,
+        adUrl: Url,
         showAd: true
-      },() => {
-          this.props.navigation.setParams({
-            tabBarVisible: false
-          })
       })
 
       this.timer = setTimeout(() => {
         this.setState({
           showAd: false,
         })
-      }, 5000)
+      }, 1000)
+    } else {
+      this.setState({
+        showAd: false
+      })
     }
   }
 
