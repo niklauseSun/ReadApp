@@ -189,10 +189,12 @@ export default class SearchView extends Component {
   loadMoreSearchList() {
     const data = {
       callback: this.loadMoreResultCallback.bind(this),
-      keyword: this.state.keyword,
+      keyword: this.state.searchWord,
       pageIndex: this.state.pageIndex,
       pageSize: 10
     }
+
+    console.log('loadMore', data)
 
     getSearchResult(data);
   }
@@ -207,7 +209,8 @@ export default class SearchView extends Component {
         let tmpArray = this.itemToArrayTop(historyList, index)
         this.setState({
           searchResultList: data,
-          historyList: tmpArray
+          historyList: tmpArray,
+          pageIndex: this.state.pageIndex + 1
         })
         saveSearchList({
           data: tmpArray
@@ -235,8 +238,9 @@ export default class SearchView extends Component {
         let index = historyList.indexOf(this.state.searchWord)
         let tmpArray = this.itemToArrayTop(historyList, index)
         this.setState({
-          searchResultList: data,
-          historyList: tmpArray
+          searchResultList: [...this.state.searchResultList, ...data],
+          historyList: tmpArray,
+          pageIndex: this.state.pageIndex+ 1
         })
         saveSearchList({
           data: tmpArray

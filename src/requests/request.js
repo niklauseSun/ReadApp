@@ -17,7 +17,7 @@ const getSubRanks = ({type, pageSize = 3, callback = null, pageIndex = 1}) => {
 }
 
 // 搜索接口
-const getSearchResult = ({keyword, callback = null, pageIndex = 1, pageSize = 0}) => {
+const getSearchResult = ({keyword, callback = null, pageIndex = 1, pageSize = 10}) => {
   getRequest(`Api/Article/Search/${keyword}?pageIndex=${pageIndex}&pageSize=${pageSize}`, callback);
 }
 

@@ -45,6 +45,8 @@ class Home extends Component {
   componentDidMount() {
     this.getAllBookDetailList();
     this.requestAd();
+
+    this.gotoBookContent();
     // 添加通知消息
     this.subscription = DeviceEventEmitter.addListener(
       "updateBookListEmit",
@@ -54,7 +56,8 @@ class Home extends Component {
 
   componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
-    this.subscription.remove()
+    this.subscription.remove();
+    this.bookTimer && clearTimeout(this.bookTimer);
   }
 
   render() {
@@ -304,7 +307,7 @@ class Home extends Component {
         this.setState({
           showAd: false,
         })
-      }, 1000)
+      }, 5000)
     } else {
       this.setState({
         showAd: false
@@ -314,6 +317,23 @@ class Home extends Component {
 
   getLocalAd() {
 
+  }
+
+  gotoBookContent() {
+    this.bookTimer = setTimeout(() => {
+      if (global.bookDetailList.length != 0) {
+        const bookItem = global.bookDetailList[0];
+        const {
+          chapterIndex,
+          articleid
+        } = bookItem
+
+        this.props.navigation.navigate("BookContent", {
+          articleid: articleid,
+          chapterIndex: chapterIndex
+        });
+      }
+    }, 5000)
   }
 
 }

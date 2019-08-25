@@ -51,10 +51,18 @@ export default class BookContent extends Component {
       willReload: false,
       refresh: false,
       loadNext: false,
+      showBottomAd: true,
+      showHeadAd: true,
+      readMode: true, // true 日间 false 夜间
     }
 
     this.loadNext = false;
     this.loadFirst = false;
+
+    this.dayMode = '#D0B48C';
+    this.nightMode = '#15100D';
+    this.dayTextColor = '#2F1D06';
+    this.nightTextColor = '#575446';
   }
 
   componentDidMount() {
@@ -98,52 +106,64 @@ export default class BookContent extends Component {
 
     console.log('htmlContent', htmlContent)
     return (
-      <View style={[styles.container]}>
+      <View style={[styles.container, {
+        backgroundColor: this.state.readMode ? this.dayMode: this.nightMode
+      }]}>
         <StatusBar barStyle="dark-content" />
-        <SafeAreaView style={styles.safeView}>
-            <View style={styles.headAd}>
-              {/* <WebView
-                style={{ width: '100%', height: '100%' }} source={{ html: htmlContent}}>
-              </WebView> */}
+        <SafeAreaView style={[styles.safeView, {
+          backgroundColor: this.state.readMode ? this.dayMode: this.nightMode
+          }]}>
+          {this.state.showHeadAd ? <View style={styles.headAd}>
             {
               Platform.OS == "ios" ? <WebView
                 source={{ html: htmlContent }}
                 style={{ width: '100%', height: '100%' }}
-              /> : this.state.headUrl == null ? null: <WebView
-                  thirdPartyCookiesEnabled={true}
-                  sharedCookiesEnabled={true}
-                  source={{ html: androidContent }}
-                  javaScriptEnabled={true}
-                  injectedJavaScript={`document.write('<script src="${this.state.headUrl}"></script>')`}
-                />
+              /> : this.state.headUrl == null ? null : <WebView
+                thirdPartyCookiesEnabled={true}
+                sharedCookiesEnabled={true}
+                source={{ html: androidContent }}
+                javaScriptEnabled={true}
+                injectedJavaScript={`document.write('<script src="${this.state.headUrl}"></script>')`}
+              />
             }
-            </View>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({
+                  showHeadAd: !this.state.showHeadAd
+                })
+              }}
+              style={{ position: 'absolute', right: 10}}>
+              <Text>X</Text>
+            </TouchableOpacity>
+          </View>: null }
+            
           <View style={[styles.readContent, { backgroundColor: this.colorChange(this.state.colorIndex) }]}>
               <ScrollView
                 ref = {(view) => { this.myScrollView = view; }}
                 // contentContainerStyle={{ paddingBottom: 20}}
                 onScroll={(e) => {
                   return;
-                  console.log('onScroll', e.nativeEvent)
+                    console.log('onScroll', e.nativeEvent)
 
-                  const { contentSize, layoutMeasurement, contentOffset } = e.nativeEvent;
+                    const { contentSize, layoutMeasurement, contentOffset } = e.nativeEvent;
 
-                  const _num = contentSize.height - layoutMeasurement.height - contentOffset.y;
+                    const _num = contentSize.height - layoutMeasurement.height - contentOffset.y;
 
-                  console.log('_num', _num)
-                  if (contentSize.height > layoutMeasurement.height && _num < -0.003)  {
-                    console.log('loadNext')
-                    this.loadNext = true;
-                    return;
-                  }
+                    console.log('_num', _num)
+                    if (contentSize.height > layoutMeasurement.height && _num < -0.003) {
+                      console.log('loadNext')
+                      this.loadNext = true;
+                      return;
+                    }
 
-                  if (contentOffset.y < -0.003) {
-                    console.log('load first')
-                    this.loadFirst = true;
-                    return;
-                  }
+                    if (contentOffset.y < -0.003) {
+                      console.log('load first')
+                      this.loadFirst = true;
+                      return;
+                    }
                 }}
                 onMomentumScrollEnd={(e) => {
+
                   console.log('onScrollEnd', e.nativeEvent)
                   var offsetY = e.nativeEvent.contentOffset.y; //滑动距离
                   var contentSizeHeight = e.nativeEvent.contentSize.height; //scrollView contentSize高度
@@ -172,7 +192,9 @@ export default class BookContent extends Component {
                       this.setState({
                         chapterid: chapterid,
                         chapterName: chaptername,
-                        chapterIndex: this.state.chapterIndex - 1
+                        chapterIndex: this.state.chapterIndex - 1,
+                        showBottomAd: true,
+                        showHeadAd: true
                       }, () => {
                         this.updateBookDetailList()
                         this.requestBookContent(true)
@@ -184,13 +206,8 @@ export default class BookContent extends Component {
                   if (Math.floor(offsetY + oriageScrollHeight) >= Math.floor(contentSizeHeight)) {
                     console.log('offset', offsetY, oriageScrollHeight, contentSizeHeight)
 
-                    // if (!this.loadNext) {
-                    //   return;
-                    // }
-
                       if (this.state.chapterIndex >= this.state.records - 1) {
                         Toast.info('已经阅读完毕！')
-                        // this.loadNext = false;
                         return;
                       }
 
@@ -207,7 +224,9 @@ export default class BookContent extends Component {
                         this.setState({
                           chapterid: chapterid,
                           chapterName: chaptername,
-                          chapterIndex: this.state.chapterIndex + 1
+                          chapterIndex: this.state.chapterIndex + 1,
+                          showBottomAd: true,
+                          showHeadAd: true
                         }, () => {
                           this.updateBookDetailList()
                           this.requestBookContent(true)
@@ -233,27 +252,39 @@ export default class BookContent extends Component {
                   fontSize: this.state.contentFontSize,
                   lineHeight: this.state.contentLineHeight,
                   backgroundColor: this.colorChange(this.state.colorIndex),
+                  color: this.state.readMode ? this.dayTextColor: this.nightTextColor
                 }}>{'\n\n' + this.state.bookContent + '\n\n\n\n'}</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
-            <View style={ styles.bottomAd}>
             {
-              Platform.OS == "ios" ? <WebView
-                source={{ html: htmlBottomContent }}
-                style={{ width: '100%', height: '100%' }}
-              /> : this.state.bottomUrl == null? null: <WebView
+            this.state.showBottomAd ? <View style={styles.bottomAd}>
+              {
+                Platform.OS == "ios" ? <WebView
+                  source={{ html: htmlBottomContent }}
+                  style={{ width: '100%', height: '100%' }}
+                /> : this.state.bottomUrl == null ? null : <WebView
+                  style={{
+                      backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                  }}
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
                   javaScriptEnabled={true}
                   injectedJavaScript={`document.write('<script src="${this.state.bottomUrl}"></script>')`}
                 />
+              }
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    showBottomAd: !this.state.showBottomAd
+                  })
+                }}
+                style={{ position: 'absolute', right: 10 }}>
+                <Text>X</Text>
+              </TouchableOpacity>
+            </View> : null
             }
-            {/* <WebView style={{ width: '100%', height: '100%' }} source={{ html: htmlBottomContent }}>
-
-              </WebView> */}
-            </View>
           <Modal
             animationType="fade"
             transparent={true}
@@ -277,13 +308,19 @@ export default class BookContent extends Component {
                   })
                 }}>
                   <Header
+                    backColor={this.state.readMode ? this.dayMode: this.nightMode}
                     title={this.state.chapterName}
+                    textColor={this.state.readMode ? this.dayTextColor: this.nightTextColor}
                     showBackButton={true}
                     navigation={this.props.navigation} />
                 </TouchableOpacity>
               </TouchableOpacity>
-              <View style={styles.bottomModalView}>
-                <View style={styles.bottomContainer}>
+              <View style={[styles.bottomModalView, {
+                backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+              }]}>
+                <View style={[styles.bottomContainer, {
+                  backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                }]}>
                   <TouchableOpacity
                     onPress={() => {
                       this.setState({
@@ -295,7 +332,9 @@ export default class BookContent extends Component {
                     activeOpacity={0.7}
                     style={styles.menuButton}>
                     <Image source={ASSET_IMAGES.ICON_MENU_BUTTON} />
-                    <Text style={styles.menuText}>目录</Text>
+                    <Text style={[styles.menuText,{
+                      color: this.state.readMode? this.dayTextColor: this.nightTextColor
+                    }]}>目录</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -307,7 +346,9 @@ export default class BookContent extends Component {
                     activeOpacity={0.7}
                     style={styles.setButton}>
                     <Image source={ASSET_IMAGES.ICON_CONTENT_SET_BUTTON} />
-                    <Text style={styles.setText}>设置</Text>
+                    <Text style={[styles.setText, {
+                      color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                    }]}>设置</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -322,9 +363,12 @@ export default class BookContent extends Component {
             visible={this.state.menuListModal}
             >
             <View style={{ flexDirection: 'row', flex: 1}}>
-              <SafeAreaView style={{ backgroundColor: '#fff', width: '80%',height:'100%' }}>
+              <SafeAreaView style={{ backgroundColor: this.state.readMode ? this.dayMode : this.nightMode, width: '80%',height:'100%' }}>
               {
                  <FlatList
+                  contentContainerStyle={{
+                      backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                  }}
                   ref={(view) => { this.flatList = view; }}
                   initialScrollIndex={this.state.chapterIndex - this.state.start + 1}
                   getItemLayout={(data, index) => (
@@ -345,7 +389,9 @@ export default class BookContent extends Component {
                           chapterIndex: chapterorder - 1,
                           chapterid: chapterid,
                           menuListModal: false,
-                          chapterName: chaptername
+                          chapterName: chaptername,
+                          showBottomAd: true,
+                          showHeadAd: true
                         }, () => {
                             console.log('updateBookDetailList')
                             this.scrollToTopView()
@@ -354,7 +400,8 @@ export default class BookContent extends Component {
                         })
                       }} style={styles.itemContent}>
                         <Text style={[styles.chapterName, {
-                          'color': index == this.state.chapterIndex - this.state.start + 1 ? '#000' : "#656E79"
+                          'color': index == this.state.chapterIndex - this.state.start + 1 ? 'red' : "#656E79",
+                          'fontWeight': index === this.state.chapterIndex - this.state.start + 1?  'bold': 'normal'
                         }]}>{item.chaptername}</Text>
                       </TouchableOpacity>
                     );
@@ -401,9 +448,13 @@ export default class BookContent extends Component {
                 }}
                 style={styles.headModalView}>
               </TouchableOpacity>
-              <View style={styles.setModalContent}>
+              <View style={[styles.setModalContent, {
+                backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+              }]}>
                 <View style={styles.lightSet}>
-                  <Text style={styles.lightSetText}>亮度</Text>
+                  <Text style={[styles.lightSetText,{
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>亮度</Text>
                   <View style={{ flex: 1 }}>
                     <Slider 
                       onChange={ this.onSliderChange.bind(this) } 
@@ -413,7 +464,9 @@ export default class BookContent extends Component {
                   <Image style={styles.lightSetImage} source={ASSET_IMAGES.ICON_BRIGHT} />
                 </View>
                 <View style={styles.wordSizeSet}>
-                  <Text style={styles.wordInfoText}>字号</Text>
+                  <Text style={[styles.wordInfoText,{
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>字号</Text>
                   <View style={styles.wordSetButtons}>
                     <TouchableOpacity onPress={this.wordMinusAction.bind(this)} activeOpacity={0.7} style={styles.wordMinus}>
                       <Text style={styles.wordMinusText}>A-</Text>
@@ -424,9 +477,11 @@ export default class BookContent extends Component {
                   </View>
                 </View>
                 <View style={styles.backgroundSetView}>
-                  <Text style={styles.backgroundText}>背景</Text>
+                  <Text style={[styles.backgroundText, {
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>背景</Text>
                   <FlatList
-                    data={['#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']}
+                    data={[this.state.readMode? this.dayMode: this.nightMode, '#FFFFFF','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']}
                     horizontal={true}
                     renderItem={({item, index}) => {
                       return <TouchableOpacity onPress={() => {
@@ -440,27 +495,55 @@ export default class BookContent extends Component {
                   />
                 </View>
                 <View style={styles.directionView}>
-                  <Text style={styles.directionText}>方向</Text>
+                  <Text style={[styles.directionText, {
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>阅读模式</Text>
                   <View style={styles.directionButtonViews}>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.oneDirectionButton}>
-                      <Text style={styles.oneDirectionText}>左右</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={[styles.oneDirectionButton, {
+                        backgroundColor: this.state.readMode ? '#999' : '#FAFAFA'
+                      }]}
+                      onPress={() => {
+                        this.setState({
+                          readMode: true
+                        })
+                      }}>
+                      <Text style={styles.oneDirectionText}>日间</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.twoDirectionButton}>
-                      <Text style={styles.twoDirectionText}>上下</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={[styles.twoDirectionButton, {
+                        backgroundColor: !this.state.readMode ? '#999' : '#FAFAFA'
+                      }]}
+                      onPress={() => {
+                        this.setState({
+                          readMode: false
+                        })
+                      }}>
+                      <Text style={styles.twoDirectionText}>夜间</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
                 <View style={styles.lineButtonViews}>
-                  <Text style={styles.lineText}>间距</Text>
+                  <Text style={[styles.lineText,{
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>间距</Text>
                   <View style={styles.lineButtons}>
                     <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 0)} activeOpacity={0.7} style={styles.largeButton}>
-                      <Text>变大</Text>
+                      <Text style={{
+                        color: this.state.readMode? this.dayTextColor: this.nightTextColor
+                      }}>变大</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 1)} activeOpacity={0.7} style={styles.normalButton}>
-                      <Text>正常</Text>
+                      <Text style={{
+                        color: this.state.readMode? this.dayTextColor: this.nightTextColor
+                      }}>正常</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.lineHeightChangeAction.bind(this, 2)} activeOpacity={0.7} style={styles.smallButton}>
-                      <Text>变小</Text>
+                      <Text style={{
+                        color: this.state.readMode? this.dayTextColor: this.nightTextColor
+                      }}>变小</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -733,16 +816,22 @@ export default class BookContent extends Component {
   colorChange(index) {
     switch(index) {
       case 0:
-        return '#FFFFFF';
+        if (this.state.readMode) {
+          return this.dayMode
+        } else {
+          return this.nightMode
+        }
       case 1:
-        return '#EBD3D3'
+        return '#FFFFFF';
       case 2:
-        return '#E4EFE1'
+        return '#EBD3D3'
       case 3:
-        return '#CBECE9'
+        return '#E4EFE1'
       case 4:
-        return '#D4DDEB'
+        return '#CBECE9'
       case 5:
+        return '#D4DDEB'
+      case 6:
         return '#CFB9C2'
     }
   }
@@ -1008,7 +1097,7 @@ const styles = StyleSheet.create({
   },
   directionButtonViews: {
     height: px(70),
-    width: px(580),
+    width: px(380),
     flexDirection: 'row',
   },
   oneDirectionButton: {

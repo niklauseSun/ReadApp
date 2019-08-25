@@ -102,7 +102,9 @@ export default class AddBookItem extends Component {
 
         let nowDate = new Date()
         global.bookDetailList[0].nowDate = nowDate,
-          global.bookDetailList[0].isAdded = true
+        global.bookDetailList[0].isAdded = true
+
+        Toast.info("添加成功")
 
         saveBookDetailList({
           data: global.bookDetailList

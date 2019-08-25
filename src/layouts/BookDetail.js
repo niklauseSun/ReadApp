@@ -167,6 +167,9 @@ export default class BookDetail extends Component {
       } else {
         let tmpArray = this.itemToArrayTop(testArray, index)
         global.bookDetailList = tmpArray;
+
+        global.bookDetailList[0].nowDate = new Date();
+
         saveBookDetailList({
           data: global.bookDetailList
         })
@@ -212,6 +215,8 @@ export default class BookDetail extends Component {
         let nowDate = new Date()
         global.bookDetailList[0].nowDate = nowDate,
         global.bookDetailList[0].isAdded = true
+
+        Toast.show("添加成功！")
 
         saveBookDetailList({
           data: global.bookDetailList

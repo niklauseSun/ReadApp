@@ -5230,11 +5230,6 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-native-bootsplash@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/react-native-bootsplash/-/react-native-bootsplash-0.1.1.tgz#252f3527d58f65c54a9c5f381fc99932728646ce"
-  integrity sha512-1a3+DZfCn9BSvfM6R9es3rn+RP3+i9rK0+46F6vMHWMaErUIJAq+KHk7xXD8T5aUEY6DLiuohNsZsuCsPnQIsg==
-
 react-native-collapsible@^1.4.0:
   version "1.5.1"
   resolved "https://registry.npmjs.org/react-native-collapsible/-/react-native-collapsible-1.5.1.tgz#da2937b509921b28bf1b0f9eb8e50ad61c3ffb5d"

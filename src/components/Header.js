@@ -12,10 +12,12 @@ export default class Header extends Component {
   }
 
   render() {
-    const { title = "首页", showBackButton = false, showRightButton = false, rightButtonText, rightButtonAction } = this.props
+    const { title = "首页", showBackButton = false, showRightButton = false, rightButtonText, rightButtonAction, backColor = '#F6F7FB', textColor = '#999' } = this.props
 
     return (
-      <View style={styles.header}>
+      <View style={[styles.header, {
+        backgroundColor: backColor
+      }]}>
         <View style={styles.left}>
           {showBackButton ? (
             <TouchableOpacity style={styles.goBack} onPress={this.goBack.bind(this)}>
@@ -23,7 +25,9 @@ export default class Header extends Component {
             </TouchableOpacity>
           ) : null}
         </View>
-        <Text numberOfLines={1} style={styles.titleStyle}>{title}</Text>
+        <Text numberOfLines={1} style={[styles.titleStyle, {
+          color: textColor
+        }]}>{title}</Text>
         <View style={styles.right}>{showRightButton ? (
           <TouchableOpacity activeOpacity={0.7} style={styles.rightButton} onPress={rightButtonAction}>
             <Text style={styles.rightButtonText}>{rightButtonText}</Text>

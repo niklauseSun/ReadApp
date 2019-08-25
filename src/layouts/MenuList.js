@@ -7,11 +7,14 @@ import {
   StatusBar,
   FlatList,
   TouchableOpacity,
-  RefreshControl
+  RefreshControl,
+  DeviceEventEmitter
 } from "react-native";
-import { getMenuList } from "../requests";
+import { getMenuList, saveBookDetailList, getBookDetail } from "../requests";
 import { px } from '../utils'
-import { Header, FooterView } from '../components';
+import { Header, FooterView, Hud } from '../components';
+import { _ } from 'lodash'
+import { Toast } from '@ant-design/react-native'
 
 export class MenuList extends Component {
     constructor(props) {
@@ -22,7 +25,9 @@ export class MenuList extends Component {
           articleid: articleid,
           totalPage: null,
           menuList: [],
-          isRefresh: false
+          isRefresh: false,
+          bookDetail: null,
+          chapterIndex: 0
         };
     }
 
@@ -64,15 +69,9 @@ export class MenuList extends Component {
     // render
     renderItem = ({ item, index }) => {
       return (
-        <TouchableOpacity onPress={() => {
-          console.log('item', item, index)
-          const { chaptername, articleid } = item
-          this.props.navigation.navigate("BookContent", {
-            articleid: articleid,
-            chapterIndex: index,
-            chapterName: chaptername
-          })
-        }} style={styles.itemContent}>
+        <TouchableOpacity
+          onPress={this.requestBookDetail.bind(this, {item})}
+          style={styles.itemContent}>
           <Text style={styles.chapterName}>{item.chaptername}</Text>
         </TouchableOpacity>
       );
@@ -136,6 +135,98 @@ export class MenuList extends Component {
             });
         }
     }
+
+  itemToArrayTop(Arr, index) {
+    console.log('itemtoArrayTop', Arr, index)
+    let tmp = Arr[index];
+    if (index == 0) {
+      return Arr;
+    }
+    for (let i = 0; i < Arr.length; i++) {
+      if (Arr[i].articleid == Arr[index].articleid) {
+        Arr.splice(i, 1);
+        break;
+      }
+    }
+    tmp.nowDate = new Date();
+    Arr.unshift(tmp);
+    return Arr;
+  }
+
+  // request
+  requestBookDetail({item}) {
+    // console.log('requestBookdetail item', item)
+    const { articleid, chapterorder } = item
+    this.setState({
+      chapterIndex: chapterorder - 1
+    }, () => {
+        const data = {
+          articleid: articleid,
+          callback: this.bookDetailCallback.bind(this)
+        }
+        getBookDetail(data);
+    })
+    
+  }
+
+  // callback
+  bookDetailCallback(res) {
+    const { state, data } = res;
+    if (state == 1) {
+      console.log('bookdetailcallback', data)
+      this.setState({
+        bookDetail: data
+      }, () => {
+        this.goToBookContent()
+      });
+    }
+  }
+
+  goToBookContent() {
+    const { chaptername, articleid } = this.state.bookDetail;
+
+    let testArray = [...global.bookDetailList]
+    
+    let bookIndex = _.findIndex(testArray, {
+      'articleid': articleid
+    });
+
+
+    if (bookIndex == -1) {
+      // 未添加
+      let nowDate = new Date();
+      const data = {
+        nowDate: nowDate,
+        chapterIndex: this.state.chapterIndex,
+        isAdded: false,
+        ...this.state.bookDetail
+      }
+
+      global.bookDetailList.unshift(data);
+      saveBookDetailList({ data: global.bookDetailList })
+      // Toast.show("添加成功！")
+      DeviceEventEmitter.emit("updateBookListEmit");
+    } else {
+      let tmpArray = this.itemToArrayTop(testArray, bookIndex)
+      global.bookDetailList = tmpArray;
+
+      global.bookDetailList[0].chapterIndex = this.state.chapterIndex
+      global.bookDetailList[0].nowDate = new Date();
+
+      saveBookDetailList({
+        data: global.bookDetailList
+      })
+      DeviceEventEmitter.emit("updateBookListEmit");
+    }
+    // const { chapterIndex = 0 } = global.bookDetailList[0];
+    this.props.navigation.navigate("BookContent", {
+      articleid: articleid,
+      chapterIndex: this.state.chapterIndex,
+      chaptername: chaptername
+    })
+
+
+  }
 }
 
 const styles = StyleSheet.create({
