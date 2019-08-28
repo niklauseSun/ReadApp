@@ -15,6 +15,9 @@ import {
 import { WebView } from 'react-native-webview';
 import { Header, Hud, FooterView } from '../components'
 
+import sc from './sc'
+import tc from './tc'
+
 const colorsBg = ['#fff','#EBD3D3', '#E4EFE1', '#CBECE9', '#D4DDEB', '#CFB9C2']
 
 export default class BookContent extends Component {
@@ -54,6 +57,7 @@ export default class BookContent extends Component {
       showBottomAd: true,
       showHeadAd: true,
       readMode: true, // true 日间 false 夜间
+      isSimple: true,
     }
 
     this.loadNext = false;
@@ -89,6 +93,7 @@ export default class BookContent extends Component {
   }
 
   render() {
+    console.log('isSimple', this.state.isSimple)
     const androidContent = `<html>
       <script type="text/javascript" charset="utf-8"">
         if(!document.__defineGetter__) {
@@ -102,7 +107,7 @@ export default class BookContent extends Component {
         }
       </script></html>`
     const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script></html>`
-    const htmlBottomContent = `<script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script>`
+    const htmlBottomContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script></html>`
 
     console.log('htmlContent', htmlContent)
     return (
@@ -119,6 +124,9 @@ export default class BookContent extends Component {
                 source={{ html: htmlContent }}
                 style={{ width: '100%', height: '100%' }}
               /> : this.state.headUrl == null ? null : <WebView
+                // style={{
+                //   backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                // }}
                 thirdPartyCookiesEnabled={true}
                 sharedCookiesEnabled={true}
                 source={{ html: androidContent }}
@@ -253,7 +261,7 @@ export default class BookContent extends Component {
                   lineHeight: this.state.contentLineHeight,
                   backgroundColor: this.colorChange(this.state.colorIndex),
                   color: this.state.readMode ? this.dayTextColor: this.nightTextColor
-                }}>{'\n\n' + this.state.bookContent + '\n\n\n\n'}</Text>
+                }}>{'\n\n' + this.convertStr(this.state.bookContent, this.state.isSimple) + '\n\n\n\n'}</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -264,9 +272,9 @@ export default class BookContent extends Component {
                   source={{ html: htmlBottomContent }}
                   style={{ width: '100%', height: '100%' }}
                 /> : this.state.bottomUrl == null ? null : <WebView
-                  style={{
-                      backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
-                  }}
+                  // style={{
+                  //     backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                  // }}
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
@@ -476,6 +484,41 @@ export default class BookContent extends Component {
                     </TouchableOpacity>
                   </View>
                 </View>
+                <View style={styles.directionView}>
+                  <Text style={[styles.directionText, {
+                    color: this.state.readMode ? this.dayTextColor : this.nightTextColor
+                  }]}>简繁体  </Text>
+                  <View style={styles.directionButtonViews}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={[styles.oneDirectionButton, {
+                        backgroundColor: this.state.isSimple ? '#999' : '#FAFAFA'
+                      }]}
+                      onPress={() => {
+                        this.setState({
+                          isSimple: true
+                        }, () => {
+                            this.updateConfig()
+                        })
+                      }}>
+                      <Text style={styles.oneDirectionText}>简体</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={[styles.twoDirectionButton, {
+                        backgroundColor: !this.state.isSimple ? '#999' : '#FAFAFA'
+                      }]}
+                      onPress={() => {
+                        this.setState({
+                          isSimple: false
+                        }, () => {
+                            this.updateConfig()
+                        })
+                      }}>
+                      <Text style={styles.twoDirectionText}>繁体</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
                 <View style={styles.backgroundSetView}>
                   <Text style={[styles.backgroundText, {
                     color: this.state.readMode ? this.dayTextColor : this.nightTextColor
@@ -507,6 +550,8 @@ export default class BookContent extends Component {
                       onPress={() => {
                         this.setState({
                           readMode: true
+                        }, () => {
+                            this.updateConfig();
                         })
                       }}>
                       <Text style={styles.oneDirectionText}>日间</Text>
@@ -519,6 +564,8 @@ export default class BookContent extends Component {
                       onPress={() => {
                         this.setState({
                           readMode: false
+                        }, () => {
+                            this.updateConfig();
                         })
                       }}>
                       <Text style={styles.twoDirectionText}>夜间</Text>
@@ -900,11 +947,15 @@ export default class BookContent extends Component {
         colorIndex = 0,
         contentFontSize = 16,
         contentLineHeight = 16,
+        isSimple = true,
+        readMode = true
       } = data;
       this.setState({
         colorIndex: colorIndex,
         contentFontSize: contentFontSize,
-        contentLineHeight: contentLineHeight
+        contentLineHeight: contentLineHeight,
+        isSimple: isSimple,
+        readMode: readMode
       })
     }
   }
@@ -913,7 +964,9 @@ export default class BookContent extends Component {
     const data = {
       colorIndex: this.state.colorIndex,
       contentFontSize: this.state.contentFontSize,
-      contentLineHeight: this.state.contentLineHeight
+      contentLineHeight: this.state.contentLineHeight,
+      isSimple: this.state.isSimple,
+      readMode: this.state.readMode
     }
     saveSetConfig({ data });
   }
@@ -953,6 +1006,19 @@ export default class BookContent extends Component {
 
   onSliderChange(e) {
       NativeModules.BrightModule.setBright(e + '')
+  }
+
+  convertStr(str, simple) {
+    if (simple) {
+      return str;
+    }
+    var ret = "", i, len, idx;
+    str = str || this;
+    for (i = 0, len = str.length; i < len; i++) {
+      idx = sc.indexOf(str.charAt(i));
+      ret += (idx === -1) ? str.charAt(i) : tc.charAt(idx);
+    }
+    return ret;
   }
 }
 
@@ -1012,7 +1078,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   setModalContent: {
-    height: px(680),
+    height: px(820),
     backgroundColor: '#fff'
   },
   lightSet: {

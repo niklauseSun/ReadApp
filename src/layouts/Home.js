@@ -37,7 +37,7 @@ class Home extends Component {
       bookDetailList: [],
       isLongSelect: false,
       selectIds: [],
-      showAd:true,
+      showAd:false,
       adUrl: null
     };
   }
@@ -321,7 +321,7 @@ class Home extends Component {
 
   gotoBookContent() {
     this.bookTimer = setTimeout(() => {
-      if (global.bookDetailList.length != 0) {
+      if (global.bookDetailList && global.bookDetailList.length != 0) {
         const bookItem = global.bookDetailList[0];
         const {
           chapterIndex,
