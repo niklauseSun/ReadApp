@@ -185,30 +185,6 @@ SetStack.navigationOptions = ({ navigation }) => {
 
 const TabNavigator = createBottomTabNavigator(
   {
-    Home: {
-      screen: HomeStack,
-      navigationOptions: {
-        header: null,
-        tabBarLabel: "我的书架",
-        tabBarIcon: ({ tintColor, focused }) => {
-          if (focused) {
-            return (
-              <Image
-                style={styles.styles}
-                source={ASSET_IMAGES.ICON_BOOK_SELECTED}
-              />
-            );
-          } else {
-            return (
-              <Image
-                style={styles.styles}
-                source={ASSET_IMAGES.ICON_BOOK_UN_SELECTED}
-              />
-            );
-          }
-        }
-      }
-    },
     Books: {
       screen: BookStack,
       navigationOptions: {
@@ -227,6 +203,30 @@ const TabNavigator = createBottomTabNavigator(
               <Image
                 style={styles.styles}
                 source={ASSET_IMAGES.ICON_MY_BOOK_UN_SELECTED}
+              />
+            );
+          }
+        }
+      }
+    },
+    Home: {
+      screen: HomeStack,
+      navigationOptions: {
+        header: null,
+        tabBarLabel: "我的书架",
+        tabBarIcon: ({ tintColor, focused }) => {
+          if (focused) {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_BOOK_SELECTED}
+              />
+            );
+          } else {
+            return (
+              <Image
+                style={styles.styles}
+                source={ASSET_IMAGES.ICON_BOOK_UN_SELECTED}
               />
             );
           }
