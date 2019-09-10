@@ -37,16 +37,16 @@ class Home extends Component {
       bookDetailList: [],
       isLongSelect: false,
       selectIds: [],
-      showAd:false,
-      adUrl: null
+      // showAd:false,
+      // adUrl: null
     };
   }
 
   componentDidMount() {
     this.getAllBookDetailList();
-    this.requestAd();
+    // this.requestAd();
 
-    this.gotoBookContent();
+    // this.gotoBookContent();
     // 添加通知消息
     this.subscription = DeviceEventEmitter.addListener(
       "updateBookListEmit",
@@ -94,7 +94,7 @@ class Home extends Component {
             rightButtonText={"取消"}
             rightButtonAction={this.cancelDelete.bind(this)}
           />
-          <Modal
+          {/* <Modal
             animationType="fade"
             transparent={true}
             visible={this.state.showAd}
@@ -118,7 +118,7 @@ class Home extends Component {
               }
               
               </SafeAreaView>
-            </Modal>
+            </Modal> */}
           <View style={styles.container}>
             <SearchBar
               onSearch={this.onSearch.bind(this)}
@@ -286,34 +286,34 @@ class Home extends Component {
     });
   }
 
-  requestAd() {
-    const data = {
-      callback: this.requestAdCallback.bind(this),
-      adType: 1
-    }
-    getAd(data)
-  }
+  // requestAd() {
+  //   const data = {
+  //     callback: this.requestAdCallback.bind(this),
+  //     adType: 1
+  //   }
+  //   getAd(data)
+  // }
 
-  requestAdCallback(res) {
-    const { state, data } = res;
-    if (state == 1) {
-      const { Url= null} = data;
-      this.setState({
-        adUrl: Url,
-        showAd: true
-      })
+  // requestAdCallback(res) {
+  //   const { state, data } = res;
+  //   if (state == 1) {
+  //     const { Url= null} = data;
+  //     this.setState({
+  //       adUrl: Url,
+  //       showAd: true
+  //     })
 
-      this.timer = setTimeout(() => {
-        this.setState({
-          showAd: false,
-        })
-      }, 5000)
-    } else {
-      this.setState({
-        showAd: false
-      })
-    }
-  }
+  //     this.timer = setTimeout(() => {
+  //       this.setState({
+  //         showAd: false,
+  //       })
+  //     }, 5000)
+  //   } else {
+  //     this.setState({
+  //       showAd: false
+  //     })
+  //   }
+  // }
 
   getLocalAd() {
 

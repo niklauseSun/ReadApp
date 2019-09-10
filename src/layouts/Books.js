@@ -15,7 +15,8 @@ import {
   Text,
   StatusBar,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Modal
 } from "react-native";
 
 import { Header, SearchBar, RankHeadItem, RankItem, AddBookItem } from "../components"
@@ -25,8 +26,11 @@ import {
   getSubRanks,
   getBookIdList,
   saveBookDetailList,
-  saveBookIdList
+  saveBookIdList,
+  getAd
 } from "../requests";
+
+import { WebView } from 'react-native-webview';
 
 class Books extends Component {
   constructor(props) {
@@ -39,11 +43,14 @@ class Books extends Component {
       fourRankData: null,
       fiveRankData: null,
       sixRankData: null,
-      bookIdList: []
+      bookIdList: [],
+      showAd: false,
+      adUrl: null
     };
   }
 
   componentDidMount() {
+    this.requestAd();
     this.getMainRankAction();
     this.getSubRankAction();
     this.getSecondRankAction();
@@ -54,6 +61,23 @@ class Books extends Component {
   }
 
   render() {
+
+    const htmlContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`
+
+
+    const iosHtml = `<html><script type="text/javascript" src="${this.state.adUrl}"></script></html>`
+
     const {
       mainRankData,
       subRankData,
@@ -68,6 +92,31 @@ class Books extends Component {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
           <Header title={"书库"} />
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={this.state.showAd}
+          >
+            <SafeAreaView style={{
+              height: '100%',
+              width: '100%'
+            }}>
+
+              {
+                Platform.OS == "ios" ? <WebView
+                  source={{ html: iosHtml }}
+                  style={{ width: '100%', height: '100%' }}
+                /> : this.state.adUrl == null ? null : <WebView
+                  thirdPartyCookiesEnabled={true}
+                  sharedCookiesEnabled={true}
+                  source={{ html: htmlContent }}
+                  javaScriptEnabled={true}
+                  injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+                />
+              }
+
+            </SafeAreaView>
+          </Modal>
           <View style={styles.container}>
             <SearchBar
               onSearch={this.onSearch.bind(this)}
@@ -398,6 +447,35 @@ getSecondRankAction = () => {
 
   goToHistory() {
     this.props.navigation.navigate('ReadHistory')
+  }
+
+  requestAd() {
+    const data = {
+      callback: this.requestAdCallback.bind(this),
+      adType: 1
+    }
+    getAd(data)
+  }
+
+  requestAdCallback(res) {
+    const { state, data } = res;
+    if (state == 1) {
+      const { Url = null } = data;
+      this.setState({
+        adUrl: Url,
+        showAd: true
+      })
+
+      this.timer = setTimeout(() => {
+        this.setState({
+          showAd: false,
+        })
+      }, 5000)
+    } else {
+      this.setState({
+        showAd: false
+      })
+    }
   }
 }
 

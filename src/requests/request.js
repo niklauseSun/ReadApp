@@ -4,7 +4,7 @@ import { Hud } from "../components"
 // http://wangu.91xiaoapp.com:8081/Api/Article/MainRanks
 
 // const serverHome = 'http://wangu.91xiaoapp.com:8081/'
-const serverHome = 'http://www.yxgxs.com:8081/'
+const serverHome = 'https://ranwem.com:8081/'
 
 // 书库主排行
 const getMainRanks = ({callback = null, pageIndex = 1, pageSize = 5}) => {
