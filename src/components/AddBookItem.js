@@ -12,7 +12,8 @@ export default class AddBookItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      bookDetail: null
+      bookDetail: null,
+      stateImage: { uri: props.item.image }
     };
   }
 
@@ -24,6 +25,8 @@ export default class AddBookItem extends Component {
       image = null
     } = this.props.item || {};
 
+
+    // console.log('render', this.state.stateImage)
     return (
       <TouchableOpacity
         activeOpacity={0.7}
@@ -32,7 +35,12 @@ export default class AddBookItem extends Component {
         {/* <View style={styles.image}>
           <Text>test</Text>
         </View> */}
-        { image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
+        { image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image onError={(error) => {
+          // console.log('error', error, this.state.stateImage)
+          this.setState({
+            stateImage: ASSET_IMAGES.ICON_DEFAULT
+          })
+        }} style={styles.image} source={this.state.stateImage} />}
         {this.renderTagView()}
         <View style={styles.detail}>
           <Text style={styles.name}>{articlename}</Text>

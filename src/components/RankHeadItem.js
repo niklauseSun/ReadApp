@@ -6,8 +6,27 @@ import { ASSET_IMAGES } from '../config';
 export default class RankHeadItem extends Component {
   constructor(props) {
     super(props);
+    const {item = {}} = props;
+    const { image = null} = item;
     this.state = {
+      stateImage: { uri: image }
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { item = {}} = this.props;
+    const { image: propsImage = null } = item;
+
+    const { item: nextItem = null } = nextProps;
+    const { image: nextImage = null } = nextItem;
+
+    console.log("receive", propsImage, nextImage, nextProps);
+
+    if (propsImage != nextImage) {
+      this.setState({
+        stateImage: { uri: nextImage }
+      });
+    }
   }
 
   render() {
@@ -15,15 +34,33 @@ export default class RankHeadItem extends Component {
       articlename = "",
       author = "",
       info = "",
-      image
+      image = null
     } = this.props.item || {};
+
+    console.log("render111", this.state.stateImage, this.props.item, image);
+
     return (
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={this.gotoBookDetail.bind(this)}
         style={styles.container}
       >
-        {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
+        {/* {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image
+            style={styles.image}
+            source={this.state.stateImage == null ? {uri: image} : this.state.stateImage }
+            onError={err => {
+              console.log("err", err, this.props.item);
+              this.setState({
+                stateImage: ASSET_IMAGES.ICON_DEFAULT
+              });
+            }}
+          />
+        } */}
+        <Image style={styles.image} source={this.state.stateImage} onError={(error) => {
+          this.setState({
+            stateImage: ASSET_IMAGES.ICON_DEFAULT
+          })
+        }} />
         <View style={styles.detail}>
           <Text style={styles.name}>{articlename}</Text>
           <Text style={styles.author}>{author}</Text>
@@ -53,6 +90,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: px(113),
+    height: px(169),
     marginRight: px(42)
   },
   detail: {
