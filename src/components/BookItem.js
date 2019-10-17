@@ -10,6 +10,7 @@ export default class BookItem extends Component {
     this.state = {
       isSelect: false,
       index : -1,
+      showDefalut: false
     };
   }
 
@@ -49,12 +50,34 @@ export default class BookItem extends Component {
           style={styles.selectButton}
           onPress={this.selectBook.bind(this)}
         >
-          {isLongSelect ? <View style={styles.selectView}>
-            {index > -1 ? <Image source={ASSET_IMAGES.ICON_SELECTED} />: <Image source={ASSET_IMAGES.ICON_SELECT} />}
-          </View> : null}
+          {isLongSelect ? (
+            <View style={styles.selectView}>
+              {index > -1 ? (
+                <Image source={ASSET_IMAGES.ICON_SELECTED} />
+              ) : (
+                <Image source={ASSET_IMAGES.ICON_SELECT} />
+              )}
+            </View>
+          ) : null}
         </TouchableOpacity>
         <View style={styles.detail}>
-          {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
+          {image == null ? (
+            <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} />
+          ) : (
+            <Image
+              onError={error => {
+                this.setState({
+                  showDefalut: true
+                });
+              }}
+              style={styles.image}
+              source={
+                this.state.showDefalut
+                  ? ASSET_IMAGES.ICON_DEFAULT
+                  : { uri: image }
+              }
+            />
+          )}
           <Text numberOfLines={1} style={styles.name}>
             {articlename}
           </Text>

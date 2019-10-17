@@ -20,8 +20,6 @@ export default class RankHeadItem extends Component {
     const { item: nextItem = null } = nextProps;
     const { image: nextImage = null } = nextItem;
 
-    console.log("receive", propsImage, nextImage, nextProps);
-
     if (propsImage != nextImage) {
       this.setState({
         stateImage: { uri: nextImage }
@@ -36,26 +34,12 @@ export default class RankHeadItem extends Component {
       info = "",
       image = null
     } = this.props.item || {};
-
-    console.log("render111", this.state.stateImage, this.props.item, image);
-
     return (
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={this.gotoBookDetail.bind(this)}
         style={styles.container}
       >
-        {/* {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image
-            style={styles.image}
-            source={this.state.stateImage == null ? {uri: image} : this.state.stateImage }
-            onError={err => {
-              console.log("err", err, this.props.item);
-              this.setState({
-                stateImage: ASSET_IMAGES.ICON_DEFAULT
-              });
-            }}
-          />
-        } */}
         <Image style={styles.image} source={this.state.stateImage} onError={(error) => {
           this.setState({
             stateImage: ASSET_IMAGES.ICON_DEFAULT

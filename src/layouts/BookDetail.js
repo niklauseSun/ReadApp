@@ -27,7 +27,8 @@ export default class BookDetail extends Component {
     this.state = {
       articleid: articleid,
       chapterIndex: chapterIndex,
-      bookDetail: null
+      bookDetail: null,
+      showDefalut: false,
     };
   }
 
@@ -70,7 +71,11 @@ export default class BookDetail extends Component {
                 {/* <View style={styles.image}>
                   <Text>test</Text>
                 </View> */}
-                {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
+                {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image onError={(error) => {
+                  this.setState({
+                    showDefalut: true
+                  })
+                }} style={styles.image} source={this.state.showDefalut ?ASSET_IMAGES.ICON_DEFAULT: { uri: image }} />}
                 <View style={styles.headInfo}>
                   <Text style={styles.name}>{articlename}</Text>
                   <Text style={styles.author}>{author}</Text>
@@ -225,28 +230,6 @@ export default class BookDetail extends Component {
       }
     }
   }
-
-    // let nowDate = new Date()
-    // const data = {
-    //   nowDate: nowDate,
-    //   chapterIndex: 0,
-    //   ...this.state.bookDetail
-    // }
-
-    // if (global.bookIdList.indexOf(articleid) == -1) {
-
-    //   global.bookIdList.push(articleid);
-    //   global.bookDetailList.unshift(data);
-    //   saveBookIdList({data: global.bookIdList })
-    //   saveBookDetailList({data: global.bookDetailList })
-    //   Toast.show("添加成功！")
-    //   DeviceEventEmitter.emit("updateBookListEmit");
-    // } else {
-    //   Toast.show("本书已添加到书库中！")
-    // }
-
-  // }
-
 
   // request
   requestBookDetail() {

@@ -29,9 +29,6 @@ export default class ReadHistoryItem extends Component {
 
     if (global.bookDetailList.length != 0) {
       const bookDetail = global.bookDetailList[index];
-
-      console.log('bookDetail', bookDetail);
-
       const {
         chapterIndex,
         articleid

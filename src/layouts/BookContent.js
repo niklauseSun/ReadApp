@@ -727,13 +727,11 @@ export default class BookContent extends Component {
   requestBottomMenuListCallback(res) {
     
     const { data, state } = res;
-    console.log('callback', res)
     if (state == 1) {
       this.setState({
           menuList: [...this.state.menuList, ...data],
           end: data[data.length -1].chapterorder,
       }, () => {
-        console.log('menuList', this.state.menuList)
 
         if (this.state.willReload) {
           const item = this.state.menuList[this.state.chapterIndex - this.state.start + 1];
@@ -782,7 +780,6 @@ export default class BookContent extends Component {
             records: records,
         })
       }
-      console.log('chapterid', chapterid)
       if (chapterid != null) {
         this.setState({
           chapterid: chapterid,
@@ -836,6 +833,7 @@ export default class BookContent extends Component {
 
   requestHeadAdCallback(res) {
     const { state, data } = res;
+    console.log('requestHeadAd', data)
     if (state == 1) {
       this.setState({
         headUrl: data.Url,
