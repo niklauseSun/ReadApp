@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     height: px(80),
-    width: "100%",
+    width: "100%"
   },
   inputContent: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: px(30),
     marginRight: px(21),
     height: px(80),
@@ -51,12 +51,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    paddingLeft: px(30),
+    paddingLeft: px(30)
   },
   input: {
     flex: 1,
     marginLeft: px(20)
-  }, 
+  },
   history: {
     marginRight: px(30)
   },
@@ -64,5 +64,8 @@ const styles = StyleSheet.create({
     marginRight: px(30),
     fontSize: px(32),
     color: "#333333"
+  },
+  headAd: {
+    height: px(120)
   }
 });

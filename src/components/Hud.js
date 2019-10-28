@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
-import { View, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
+import { View, ActivityIndicator, StyleSheet, Dimensions, Text } from "react-native";
 import RootSiblings from "react-native-root-siblings"
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
+import { px } from '../utils'
 
 let sibling = undefined;
 
@@ -13,6 +14,7 @@ const HUD = {
       <View style={styles.maskStyle}>
         <View style={styles.backViewStyle}>
           <ActivityIndicator size="large" color="white" />
+          <Text style={styles.hubText}>正在加载</Text>
         </View>
       </View>
     )
@@ -42,6 +44,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5
+  },
+  hubText: {
+    color: 'white',
+    fontSize: px(28),
+    marginTop: px(6)
   }
 });
 

@@ -58,6 +58,8 @@ export default class BookContent extends Component {
       showHeadAd: true,
       readMode: true, // true 日间 false 夜间
       isSimple: true,
+      pageIndex: 0,
+      totalPage: 0,
     }
 
     this.loadNext = false;
@@ -380,7 +382,7 @@ export default class BookContent extends Component {
                   ref={(view) => { this.flatList = view; }}
                   initialScrollIndex={this.state.chapterIndex - this.state.start + 1}
                   getItemLayout={(data, index) => (
-                    { length: px(100), offset: px(100) * index, index }
+                    { length: px(100), offset: px(75) * index, index }
                   )}
                   ListFooterComponent={<FooterView />}
                   data={this.state.menuList}
@@ -416,6 +418,28 @@ export default class BookContent extends Component {
                   }}
                 />
               }
+              <View style={{
+                height: px(80),
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+                  flex: 1,
+                  marginLeft: px(20)
+                }}>章节 {this.state.chapterIndex + 1}/{this.state.records}</Text>
+                <TouchableOpacity style={{
+                  marginRight: px(20)
+                }}
+                onPress={() => {
+                  this.flatList.scrollToOffset({
+                    animated: true,
+                    y: 0
+                  })
+                }}
+                >
+                  <Text>返回顶部</Text>
+                </TouchableOpacity>
+              </View>
               </SafeAreaView>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -689,16 +713,18 @@ export default class BookContent extends Component {
           if (this.state.willReload) {
             const item = this.state.menuList[this.state.chapterIndex - this.state.start + 1];
             const { chaptername, chapterid } = item;
-
-            this.setState({
-              chapterName: chaptername,
-              chapterid: chapterid,
-              willReload: false
-            }, () => {
-              this.updateBookDetailList()
-              this.requestBookContent(true)
-              this.scrollToTopView()
-            })
+            this.setState(
+              {
+                chapterName: chaptername,
+                chapterid: chapterid,
+                willReload: false,
+              },
+              () => {
+                this.updateBookDetailList();
+                this.requestBookContent(true);
+                this.scrollToTopView();
+              }
+            );
           }
       })
     }
@@ -740,7 +766,7 @@ export default class BookContent extends Component {
           this.setState({
             chapterName: chaptername,
             chapterid: chapterid,
-            willReload: false
+            willReload: false,
           }, () => {
             this.updateBookDetailList()
             this.requestBookContent(true)
@@ -826,7 +852,7 @@ export default class BookContent extends Component {
   requestHeadAd() {
     const data = {
       callback: this.requestHeadAdCallback.bind(this),
-      adType: 5
+      adType: 2
     }
     getAd(data)
   }
@@ -844,7 +870,7 @@ export default class BookContent extends Component {
   requestBottomAd() {
     const data = {
       callback: this.requestBottomAdCallback.bind(this),
-      adType: 5
+      adType: 2
     }
     getAd(data)
   }
@@ -1247,7 +1273,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemContent: {
-    height: px(100),
+    height: px(75),
     //   alignItems: "center"
     justifyContent: "center",
     paddingLeft: px(20)

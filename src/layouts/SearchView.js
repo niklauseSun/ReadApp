@@ -7,7 +7,8 @@ import {
   StyleSheet,
   Image,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  Platform,
 } from "react-native";
 import { SearchInputView, Header, RankHeadItem, FooterView } from '../components';
 import { px } from '../utils'
@@ -16,8 +17,10 @@ import {
   getSearchList,
   saveSearchList,
   clearSearchList,
-  getSearchResult
+  getSearchResult,
+  getAd
 } from "../requests";
+import { WebView } from "react-native-webview";
 
 export default class SearchView extends Component {
 
@@ -29,35 +32,126 @@ export default class SearchView extends Component {
       showSearchResult: false,
       searchResultList: [],
       pageIndex: 1,
-    }
+      adUrl: null,
+      showBottomAd: true,
+      showHeadAd: true,
+      showBottomAd: true,
+    };
   }
 
   componentDidMount() {
     this.requestSearchHistory()
+    this.requestSearchAd();
   }
 
   render() {
+
+    const androidContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`;
+
+    const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.adUrl}"></script></html>`;
+    const htmlBottomContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.adUrl}"></script></html>`;
+
     return (
       <View style={styles.container}>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
           {/* <Header navigation={this.props.navigation} showBackButton={true}/> */}
+
           <View style={styles.content}>
+            {this.state.showHeadAd ? (
+              <View style={styles.headAd}>
+                {Platform.OS == "ios" ? (
+                  <WebView
+                    source={{ html: htmlContent }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "red"
+                    }}
+                  />
+                ) : this.state.adUrl == null ? null : (
+                  <WebView
+                    // style={{
+                    //   backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                    // }}
+                    thirdPartyCookiesEnabled={true}
+                    sharedCookiesEnabled={true}
+                    source={{ html: androidContent }}
+                    javaScriptEnabled={true}
+                    injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+                  />
+                )}
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      showHeadAd: !this.state.showHeadAd
+                    });
+                  }}
+                  style={{ position: "absolute", right: 10 }}
+                >
+                  <Text>X</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
             <SearchInputView
               onSearchAction={this.onSearchAction.bind(this)}
               onCancel={this.onCancel.bind(this)}
               onChangeText={this.onChangeText.bind(this)}
               value={this.state.searchWord || ""}
-              />
-              {this.state.searchWord == null || this.state.searchWord.length == 0 ? this.renderHistory(this.state.historyList): 
-              this.renderSearchResult(this.state.searchResultList)}
-            {/* {this.renderHistory(this.state.historyList)} */}
-
-            {/* {this.renderSearchResult(this.state.searchResultList)} */}
+            />
+            {this.state.searchWord == null || this.state.searchWord.length == 0
+              ? this.renderHistory(this.state.historyList)
+              : this.renderSearchResult(this.state.searchResultList)}
+            {this.state.showBottomAd ? (
+              <View style={styles.bottomAd}>
+                {Platform.OS == "ios" ? (
+                  <WebView
+                    source={{ html: htmlContent }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "red"
+                    }}
+                  />
+                ) : this.state.adUrl == null ? null : (
+                  <WebView
+                    // style={{
+                    //   backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                    // }}
+                    thirdPartyCookiesEnabled={true}
+                    sharedCookiesEnabled={true}
+                    source={{ html: androidContent }}
+                    javaScriptEnabled={true}
+                    injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+                  />
+                )}
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      showBottomAd: !this.state.showBottomAd
+                    });
+                  }}
+                  style={{ position: "absolute", right: 10 }}
+                >
+                  <Text>X</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
         </SafeAreaView>
       </View>
-    )
+    );
   }
 
   renderHistory = (historyList) => {
@@ -171,6 +265,24 @@ export default class SearchView extends Component {
       console.log('searchHistory', data)
       this.setState({
         historyList: data || []
+      })
+    }
+  }
+
+  requestSearchAd() {
+    const data = {
+      callback: this.requestSearchAdCallback.bind(this),
+      adType: 2
+    };
+    getAd(data)
+  }
+
+  requestSearchAdCallback(res) {
+    const { state, data } = res;
+    console.log("requestSearchAd", data);
+    if (state == 1) {
+      this.setState({
+        adUrl: data.Url,
       })
     }
   }
@@ -291,7 +403,7 @@ const styles = StyleSheet.create({
   historyHead: {
     height: px(90),
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center"
   },
   historyHeadText: {
     fontSize: px(38),
@@ -313,11 +425,19 @@ const styles = StyleSheet.create({
     marginTop: px(30),
     alignItems: "center",
     marginLeft: px(30),
-    justifyContent: 'center',
-    maxWidth: '33%'
+    justifyContent: "center",
+    maxWidth: "33%"
   },
   historyText: {
     fontSize: px(34),
     color: "#71A783"
+  },
+  headAd: {
+    height: px(120),
+    marginBottom: px(20)
+  },
+  bottomAd: {
+    height: px(120),
+    marginTop: px(20)
   }
 });

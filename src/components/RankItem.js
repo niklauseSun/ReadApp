@@ -7,6 +7,7 @@ export default class RankItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      showDefault: false
     };
   }
 
@@ -21,7 +22,20 @@ export default class RankItem extends Component {
       >
         {/* <View style={styles.image}> */}
         {/* <Text>test</Text> */}
-        {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />}
+        {/* {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image style={styles.image} source={{ uri: image }} />} */}
+        {image == null ? (
+          <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} />
+        ) : (
+          <Image
+            onError={error => {
+              this.setState({
+                showDefault: true
+              });
+            }}
+            style={styles.image}
+            source={this.state.showDefault? ASSET_IMAGES.ICON_DEFAULT : { uri: image }}
+          />
+        )}
         {/* </View> */}
         <View style={styles.detail}>
           <Text numberOfLines={1} style={styles.name}>

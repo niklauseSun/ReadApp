@@ -44,7 +44,7 @@ class Books extends Component {
       fiveRankData: null,
       sixRankData: null,
       bookIdList: [],
-      showAd: false,
+      showAd: true,
       adUrl: null
     };
   }

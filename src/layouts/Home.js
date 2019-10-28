@@ -69,6 +69,8 @@ class Home extends Component {
       dataArray.push({type: 1})
     }
 
+    console.log("remove", dataArray, bookDetailList);
+
     const htmlContent = `<html>
       <script type="text/javascript" charset="utf-8"">
         if(!document.__defineGetter__) {
@@ -211,11 +213,14 @@ class Home extends Component {
 
       const ids = _.difference(this.state.bookIdList, selectIds)
 
+      console.log("sss", selectIds, ids, lastDetails, bookDetailList);
+
       this.setState({
-        bookDetailList: lastDetails,
+        bookDetailList: bookDetailList,
         isLongSelect: false
-      })
+      });
       saveBookDetailList({ data: bookDetailList })
+      global.bookDetailList = bookDetailList;
 
       DeviceEventEmitter.emit("updateBookListEmit");
     }
