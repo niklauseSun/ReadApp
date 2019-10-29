@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     paddingLeft: px(30),
     paddingRight: px(30),
     flexDirection: 'row',
+    paddingTop: px(30),
     width: '100%'
   },
   image: {

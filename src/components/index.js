@@ -11,6 +11,8 @@ import Hud from './Hud'
 import SearchInputView from "./SearchInputView";
 import AddItem from './AddItem'
 import FooterView from './FooterView'
+import RankHead from './RankHead'
+
 export {
   Header,
   SearchBar,
@@ -24,5 +26,6 @@ export {
   Hud,
   SearchInputView,
   AddItem,
-  FooterView
+  FooterView,
+  RankHead,
 };

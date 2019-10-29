@@ -12,12 +12,18 @@ import {
 } from "react-native";
 import { px } from '../utils'
 import { Header, Hud } from '../components';
-import { getBookDetail, saveBookIdList, saveBookDetailList } from "../requests";
+import {
+  getBookDetail,
+  saveBookIdList,
+  saveBookDetailList,
+  getAd
+} from "../requests";
 import { Toast } from "@ant-design/react-native";
 import { ASSET_IMAGES } from '../config';
 import {
   _
 } from 'lodash'
+import { WebView } from "react-native-webview";
 
 export default class BookDetail extends Component {
 
@@ -29,11 +35,14 @@ export default class BookDetail extends Component {
       chapterIndex: chapterIndex,
       bookDetail: null,
       showDefalut: false,
+      showAd: true,
+      adUrl: null
     };
   }
 
   componentDidMount() {
     this.requestBookDetail()
+    this.requestDetailAd();
   }
 
   componentWillUnmount() {
@@ -53,8 +62,24 @@ export default class BookDetail extends Component {
       image = null,
       intro,
       chapters,
-      size
-    } = bookDetail
+      size,
+      lastupdate
+    } = bookDetail;
+
+    const androidContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`;
+
+    const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.adUrl}"></script></html>`;
 
     return (
       <View style={styles.container}>
@@ -71,15 +96,33 @@ export default class BookDetail extends Component {
                 {/* <View style={styles.image}>
                   <Text>test</Text>
                 </View> */}
-                {image == null ? <Image style={styles.image} source={ASSET_IMAGES.ICON_DEFAULT} /> : <Image onError={(error) => {
-                  this.setState({
-                    showDefalut: true
-                  })
-                }} style={styles.image} source={this.state.showDefalut ?ASSET_IMAGES.ICON_DEFAULT: { uri: image }} />}
+                {image == null ? (
+                  <Image
+                    style={styles.image}
+                    source={ASSET_IMAGES.ICON_DEFAULT}
+                  />
+                ) : (
+                  <Image
+                    onError={error => {
+                      this.setState({
+                        showDefalut: true
+                      });
+                    }}
+                    style={styles.image}
+                    source={
+                      this.state.showDefalut
+                        ? ASSET_IMAGES.ICON_DEFAULT
+                        : { uri: image }
+                    }
+                  />
+                )}
                 <View style={styles.headInfo}>
                   <Text style={styles.name}>{articlename}</Text>
                   <Text style={styles.author}>{author}</Text>
                   <Text style={styles.textNum}>共{size}字</Text>
+                  <Text style={styles.lastUpdate}>
+                    最后更新时间：{lastupdate}
+                  </Text>
                 </View>
               </View>
               <View style={styles.info}>
@@ -108,6 +151,41 @@ export default class BookDetail extends Component {
                 </View>
               </TouchableOpacity>
             </ScrollView>
+            {this.state.showAd ? (
+              <View style={styles.headAd}>
+                {Platform.OS == "ios" ? (
+                  <WebView
+                    source={{ html: htmlContent }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "red"
+                    }}
+                  />
+                ) : this.state.adUrl == null ? null : (
+                  <WebView
+                    // style={{
+                    //   backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
+                    // }}
+                    thirdPartyCookiesEnabled={true}
+                    sharedCookiesEnabled={true}
+                    source={{ html: androidContent }}
+                    javaScriptEnabled={true}
+                    injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+                  />
+                )}
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      showAd: !this.state.showAd
+                    });
+                  }}
+                  style={{ position: "absolute", right: 10 }}
+                >
+                  <Text>X</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
             <View style={styles.bottomView}>
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -252,6 +330,24 @@ export default class BookDetail extends Component {
     }
   }
 
+  requestDetailAd() {
+    const data = {
+      callback: this.requestDetailAdCallback.bind(this),
+      adType: 2
+    };
+    getAd(data);
+  }
+
+  requestDetailAdCallback(res) {
+    const { state, data } = res;
+    console.log('data', data.Url)
+    if (state == 1) {
+      this.setState({
+        adUrl: data.Url
+      });
+    }
+  }
+
   itemToArrayTop(Arr, index) {
     console.log('itemtoArrayTop', Arr, index)
     let tmp = Arr[index];
@@ -290,8 +386,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff"
   },
   image: {
-    height: px(256),
-    width: px(171),
+    height: px(300),
+    width: px(216),
     marginLeft: px(38),
     marginRight: px(54)
   },
@@ -320,7 +416,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: px(32),
-    lineHeight: px(52),
+    lineHeight: px(52)
   },
   menu: {
     height: px(140),
@@ -355,10 +451,10 @@ const styles = StyleSheet.create({
     // marginLeft: px(40)
     width: px(120),
     height: px(120),
-    justifyContent: 'center'
+    justifyContent: "center"
   },
   addButtonView: {
-    alignItems: 'center'
+    alignItems: "center"
   },
   addText: {
     marginTop: px(10),
@@ -377,5 +473,12 @@ const styles = StyleSheet.create({
   readText: {
     color: "#FFFFFF",
     fontSize: px(36)
+  },
+  lastUpdate: {
+    color: "#656e79",
+    fontSize: px(28)
+  },
+  headAd: {
+    height: px(120),
   }
 });

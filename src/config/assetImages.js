@@ -27,7 +27,8 @@ const ASSET_IMAGES = {
   ICON_CLEAN_CACHE: require('../assets/iconCleanCache.png'),
   ICON_DEFAULT_HEADIMAGE: require('../assets/defaultHeadImage.png'),
   ICON_MY_SET_BACK_IMAGE: require('../assets/mySetBackImage.png'),
-  ICON_DEFAULT: require('../assets/defaultImage.png')
+  ICON_DEFAULT: require('../assets/defaultImage.png'),
+  ICON_RANK_BACKGROUND: require('../assets/rankBackground.png')
 }
 
 export default ASSET_IMAGES
