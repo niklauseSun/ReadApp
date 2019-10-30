@@ -50,13 +50,14 @@ class Books extends Component {
       fiveRankData: null,
       sixRankData: null,
       bookIdList: [],
-      showAd: true,
+      showAd: false,
       adUrl: null
     };
   }
 
   componentDidMount() {
-    this.requestAd();
+    // this.requestLocalAd();
+    // this.requestAd();
     this.getMainRankAction();
     this.getSubRankAction();
     this.getSecondRankAction();
@@ -66,24 +67,11 @@ class Books extends Component {
     this.getSixRankAction();
   }
 
+  componentWillUnmount() {
+    this.timer = null;
+  }
+
   render() {
-
-    const htmlContent = `<html>
-      <script type="text/javascript" charset="utf-8"">
-        if(!document.__defineGetter__) {
-          Object.defineProperty(document, 'cookie', {
-              get: function(){return ''},
-              set: function(){return true},
-          });
-        } else {
-          document.__defineGetter__("cookie", function() { return '';} );
-          document.__defineSetter__("cookie", function() {} );
-        }
-      </script></html>`
-
-
-    const iosHtml = `<html><script type="text/javascript" src="${this.state.adUrl}"></script></html>`
-
     const {
       mainRankData,
       subRankData,
@@ -98,33 +86,6 @@ class Books extends Component {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView style={styles.safeView}>
           <Header title={"书库"} />
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={this.state.showAd}
-          >
-            <SafeAreaView
-              style={{
-                height: "100%",
-                width: "100%"
-              }}
-            >
-              {Platform.OS == "ios" ? (
-                <WebView
-                  source={{ html: iosHtml }}
-                  style={{ width: "100%", height: "100%" }}
-                />
-              ) : this.state.adUrl == null ? null : (
-                <WebView
-                  thirdPartyCookiesEnabled={true}
-                  sharedCookiesEnabled={true}
-                  source={{ html: htmlContent }}
-                  javaScriptEnabled={true}
-                  injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
-                />
-              )}
-            </SafeAreaView>
-          </Modal>
           <View style={styles.container}>
             <SearchBar
               onSearch={this.onSearch.bind(this)}
@@ -132,7 +93,7 @@ class Books extends Component {
             />
             <ScrollView style={styles.content}>
               <View style={styles.rank}>
-                <RankHead title="主排行" />
+                <RankHead title="排行榜" />
                 <RankHeadItem
                   item={
                     mainRankData == null
@@ -380,7 +341,7 @@ class Books extends Component {
       callback: this.getMainRankCallback.bind(this)
     };
     getMainRanks(data);
-  }
+  };
 
   getSubRankAction = () => {
     const data = {
@@ -388,15 +349,15 @@ class Books extends Component {
       type: 1
     };
     getSubRanks(data);
-  }
+  };
 
-getSecondRankAction = () => {
+  getSecondRankAction = () => {
     const data = {
       callback: this.getSecondRandCallback.bind(this),
       type: 2
     };
     getSubRanks(data);
-  }
+  };
 
   getThirdRankAction = () => {
     const data = {
@@ -404,15 +365,15 @@ getSecondRankAction = () => {
       type: 3
     };
     getSubRanks(data);
-  }
+  };
 
-  getFourRankAction = () =>  {
+  getFourRankAction = () => {
     const data = {
       callback: this.getFourRandCallback.bind(this),
       type: 4
     };
     getSubRanks(data);
-  }
+  };
 
   getFiveRankAction = () => {
     const data = {
@@ -420,15 +381,15 @@ getSecondRankAction = () => {
       type: 5
     };
     getSubRanks(data);
-  }
+  };
 
-  getSixRankAction = () =>  {
+  getSixRankAction = () => {
     const data = {
       callback: this.getSixRandCallback.bind(this),
       type: 6
     };
     getSubRanks(data);
-  }
+  };
   // callback
   getMainRankCallback(res) {
     const { state, data } = res;
@@ -492,19 +453,35 @@ getSecondRankAction = () => {
   }
 
   onSearch() {
-    this.props.navigation.push("SearchView")
+    this.props.navigation.push("SearchView");
   }
 
   goToHistory() {
-    this.props.navigation.navigate('ReadHistory')
+    this.props.navigation.navigate("ReadHistory");
+  }
+
+  requestLocalAd() {
+    global.storage
+      .load({
+        key: "adUrl"
+      })
+      .then(ret => {
+        console.log('ret url', ret)
+        this.setState({
+          adUrl: ret
+        })
+      })
+      .catch(err => {
+        
+      });
   }
 
   requestAd() {
     const data = {
       callback: this.requestAdCallback.bind(this),
       adType: 1
-    }
-    getAd(data)
+    };
+    getAd(data);
   }
 
   requestAdCallback(res) {
@@ -514,17 +491,24 @@ getSecondRankAction = () => {
       this.setState({
         adUrl: Url,
         showAd: true
-      })
+      });
+
+      if (Url != null) {
+        global.storage.save({
+          key: "adUrl",
+          data: Url
+        });
+      }
 
       this.timer = setTimeout(() => {
         this.setState({
-          showAd: false,
-        })
-      }, 5000)
+          showAd: false
+        });
+      }, 5000);
     } else {
       this.setState({
         showAd: false
-      })
+      });
     }
   }
 }

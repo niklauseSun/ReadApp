@@ -6,15 +6,16 @@
  * @flow
  */
 
-import React, {Fragment} from 'react';
+import React, { Component } from "react";
 import {
   SafeAreaView,
   StyleSheet,
   ScrollView,
   View,
   Text,
-  StatusBar
-} from 'react-native';
+  StatusBar,
+  Platform
+} from "react-native";
 
 import {
   Header,
@@ -28,6 +29,9 @@ import Storage from "react-native-storage";
 import TabNav from './src/router/router'
 import { Provider } from "@ant-design/react-native"
 
+import { getAd } from "./src/requests";
+import { WebView } from "react-native-webview";
+import { ASSET_IMAGES } from "./src/config";
 var storage = new Storage({
   size: 1000,
   storageBackend: AsyncStorage,
@@ -42,56 +46,132 @@ console.disableYellowBox = true // 关闭全部黄色警告
 global.bookIdList = []
 global.bookDetailList = [];
 
-const App = () => {
-  return (
-    <Provider>
-      <TabNav />
-    </Provider>
-  );
-}
 
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showAd: true,
+      adUrl: null
+    };
+  }
+
+  componentDidMount() {
+    this.requestLocalAd();
+    this.requestAd();
+    this.timer = setTimeout(() => {
+      this.setState({
+        showAd: false
+      });
+    }, 5000);
+  }
+
+  componentWillUnmount() {
+    this.timer = null;
+  }
+
+  render() {
+
+    const htmlContent = `<html>
+      <script type="text/javascript" charset="utf-8"">
+        if(!document.__defineGetter__) {
+          Object.defineProperty(document, 'cookie', {
+              get: function(){return ''},
+              set: function(){return true},
+          });
+        } else {
+          document.__defineGetter__("cookie", function() { return '';} );
+          document.__defineSetter__("cookie", function() {} );
+        }
+      </script></html>`;
+
+    const iosHtml = `<html><script type="text/javascript" src="${this.state.adUrl}"></script></html>`;
+
+    return (
+      <Provider>
+        {this.state.showAd ? (
+          <View
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            {Platform.OS == "ios" ? (
+              <WebView
+                source={{ html: iosHtml }}
+                style={{ width: "100%", height: "100%" }}
+              />
+            ) : this.state.adUrl == null ? (
+              <View style={{ width: "100%", height: "100%" }} />
+            ) : (
+              <WebView
+                thirdPartyCookiesEnabled={true}
+                sharedCookiesEnabled={true}
+                source={{ html: htmlContent }}
+                javaScriptEnabled={true}
+                injectedJavaScript={`document.write('<script src="${this.state.adUrl}"></script>')`}
+              />
+            )}
+          </View>
+        ) : (
+          <TabNav />
+        )}
+      </Provider>
+    );
+  }
+
+  requestLocalAd() {
+    global.storage
+      .load({
+        key: "adUrl"
+      })
+      .then(ret => {
+        console.log("ret url", ret);
+        this.setState({
+          adUrl: ret
+        });
+      })
+      .catch(err => {});
+  }
+
+  requestAd() {
+    const data = {
+      callback: this.requestAdCallback.bind(this),
+      adType: 1
+    };
+    getAd(data);
+  }
+
+  requestAdCallback(res) {
+    const { state, data } = res;
+    console.log('requestad', res)
+    if (state == 1) {
+      const { Url = null } = data;
+      this.setState({
+        adUrl: Url,
+      });
+
+      if (Url != null) {
+        global.storage.save({
+          key: "adUrl",
+          data: Url
+        });
+      }
+    } else {
+      this.setState({
+        showAd: false
+      });
+    }
+  }
+}
 // const App = () => {
+  
 //   return (
-//     <Fragment>
-//       <StatusBar barStyle="dark-content" />
-//       <SafeAreaView>
-//         <ScrollView
-//           contentInsetAdjustmentBehavior="automatic"
-//           style={styles.scrollView}>
-//           <Header />
-//           <View style={styles.body}>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Step One</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Edit <Text style={styles.highlight}>App.js</Text> to change this
-//                 screen and then come back to see your edits.
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>See Your Changes</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <ReloadInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Debug</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <DebugInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Learn More</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Read the docs to discover what to do next:
-//               </Text>
-//             </View>
-//             <LearnMoreLinks />
-//           </View>
-//         </ScrollView>
-//       </SafeAreaView>
-//     </Fragment>
+//     <Provider>
+//       <TabNav />
+//     </Provider>
 //   );
-// };
+// }
 
 const styles = StyleSheet.create({
   scrollView: {

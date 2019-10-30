@@ -17,23 +17,23 @@ import { _ } from 'lodash'
 import { Toast } from '@ant-design/react-native'
 
 export class MenuList extends Component {
-    constructor(props) {
-        super(props);
-        const { articleid } = props.navigation.state.params || {};
-        this.state = {
-          pageIndex: 1,
-          articleid: articleid,
-          totalPage: null,
-          menuList: [],
-          isRefresh: false,
-          bookDetail: null,
-          chapterIndex: 0
-        };
-    }
+  constructor(props) {
+      super(props);
+      const { articleid } = props.navigation.state.params || {};
+      this.state = {
+        pageIndex: 1,
+        articleid: articleid,
+        totalPage: null,
+        menuList: [],
+        isRefresh: false,
+        bookDetail: null,
+        chapterIndex: 0
+      };
+  }
 
-    componentDidMount() {
+  componentDidMount() {
     this.getMenuListAction();
-    }
+  }
 
     render() {
         const { menuList } = this.state;
@@ -57,7 +57,7 @@ export class MenuList extends Component {
                   />
                 }
                 onEndReached={this.loadMore.bind(this)}
-                onEndReachedThreshold={0.1}
+                // onEndReachedThreshold={0.1}
                 refreshing={this.state.isRefresh}
                 ListFooterComponent={() => <FooterView />}
               />
@@ -81,13 +81,14 @@ export class MenuList extends Component {
 
     // request
     getMenuListAction() {
-        const data = {
-            pageSize: 10,
-            pageIndex: this.state.pageIndex,
-            callback: this.getMenuListCallback.bind(this),
-            articleid: this.state.articleid
-        };
-        getMenuList(data);
+      Hud.show()
+      const data = {
+          pageSize: 10,
+          pageIndex: this.state.pageIndex,
+          callback: this.getMenuListCallback.bind(this),
+          articleid: this.state.articleid
+      };
+      getMenuList(data);
     }
 
     _onRefresh() {
@@ -113,27 +114,28 @@ export class MenuList extends Component {
     }
 
     loadMore() {
-        const data = {
-          pageSize: 10,
-          pageIndex: this.state.pageIndex + 1,
-          callback: this.getMenuListCallback.bind(this),
-          articleid: this.state.articleid
-        };
-        getMenuList(data);
+      const data = {
+        pageSize: 10,
+        pageIndex: this.state.pageIndex + 1,
+        callback: this.getMenuListCallback.bind(this),
+        articleid: this.state.articleid
+      };
+      getMenuList(data);
     }
 
     getMenuListCallback(res) {
-        console.log("getMenuListCallback", res);
-        const { state, page, data } = res;
-        if (state == 1) {
-            const { totalPage, pageIndex } = page;
-            this.setState({
-              totalPage: totalPage,
-              pageIndex: pageIndex,
-              menuList: this.state.menuList.concat(data),
-              isRefresh: false
-            });
-        }
+      Hud.hidden();
+      console.log("getMenuListCallback", res);
+      const { state, page, data } = res;
+      if (state == 1) {
+        const { totalPage, pageIndex } = page;
+        this.setState({
+          totalPage: totalPage,
+          pageIndex: pageIndex,
+          menuList: this.state.menuList.concat(data),
+          isRefresh: false
+        });
+      }
     }
 
   itemToArrayTop(Arr, index) {
@@ -155,18 +157,16 @@ export class MenuList extends Component {
 
   // request
   requestBookDetail({item}) {
-    // console.log('requestBookdetail item', item)
     const { articleid, chapterorder } = item
     this.setState({
       chapterIndex: chapterorder - 1
     }, () => {
-        const data = {
-          articleid: articleid,
-          callback: this.bookDetailCallback.bind(this)
-        }
-        getBookDetail(data);
+      const data = {
+        articleid: articleid,
+        callback: this.bookDetailCallback.bind(this)
+      }
+      getBookDetail(data);
     })
-    
   }
 
   // callback
@@ -184,13 +184,10 @@ export class MenuList extends Component {
 
   goToBookContent() {
     const { chaptername, articleid } = this.state.bookDetail;
-
     let testArray = [...global.bookDetailList]
-    
     let bookIndex = _.findIndex(testArray, {
       'articleid': articleid
     });
-
 
     if (bookIndex == -1) {
       // 未添加
@@ -204,12 +201,11 @@ export class MenuList extends Component {
 
       global.bookDetailList.unshift(data);
       saveBookDetailList({ data: global.bookDetailList })
-      // Toast.show("添加成功！")
       DeviceEventEmitter.emit("updateBookListEmit");
     } else {
       let tmpArray = this.itemToArrayTop(testArray, bookIndex)
+      
       global.bookDetailList = tmpArray;
-
       global.bookDetailList[0].chapterIndex = this.state.chapterIndex
       global.bookDetailList[0].nowDate = new Date();
 
@@ -218,14 +214,14 @@ export class MenuList extends Component {
       })
       DeviceEventEmitter.emit("updateBookListEmit");
     }
-    // const { chapterIndex = 0 } = global.bookDetailList[0];
     this.props.navigation.navigate("BookContent", {
       articleid: articleid,
       chapterIndex: this.state.chapterIndex,
       chaptername: chaptername
     })
-
-
+  }
+  componentWillUnmount() {
+    this.timer = null;
   }
 }
 

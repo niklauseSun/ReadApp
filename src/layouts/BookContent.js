@@ -60,7 +60,7 @@ export default class BookContent extends Component {
       isSimple: true,
       pageIndex: 0,
       totalPage: 0,
-      showInput: true,
+      showInput: false,
       chapterInputValue: null,
     }
 

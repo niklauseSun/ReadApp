@@ -16,7 +16,6 @@ export default class RankHeadItem extends Component {
   componentWillReceiveProps(nextProps) {
     const { item = {}} = this.props;
     const { image: propsImage = null } = item;
-
     const { item: nextItem = null } = nextProps;
     const { image: nextImage = null } = nextItem;
 
