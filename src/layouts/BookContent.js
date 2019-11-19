@@ -62,6 +62,8 @@ export default class BookContent extends Component {
       totalPage: 0,
       showInput: false,
       chapterInputValue: null,
+
+      menuDirection: true,
     }
 
     this.loadNext = false;
@@ -97,7 +99,6 @@ export default class BookContent extends Component {
   }
 
   render() {
-    console.log('isSimple', this.state.isSimple)
     const androidContent = `<html>
       <script type="text/javascript" charset="utf-8"">
         if(!document.__defineGetter__) {
@@ -113,7 +114,12 @@ export default class BookContent extends Component {
     const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script></html>`
     const htmlBottomContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script></html>`
 
-    console.log('htmlContent', htmlContent)
+    const menuIndex = this.state.menuDirection
+      ? this.state.chapterIndex - this.state.start + 1 < 0
+        ? 0
+        : this.state.chapterIndex - this.state.start + 1
+      : this.state.records - this.state.chapterIndex - 1;
+    // const menuIndex = 0;
     return (
       <View
         style={[
@@ -209,17 +215,9 @@ export default class BookContent extends Component {
                 }
               }}
               onMomentumScrollEnd={e => {
-                console.log("onScrollEnd", e.nativeEvent);
                 var offsetY = e.nativeEvent.contentOffset.y; //滑动距离
                 var contentSizeHeight = e.nativeEvent.contentSize.height; //scrollView contentSize高度
                 var oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; //scrollView高度
-                console.log("onScrollEnd", offsetY);
-                console.log(
-                  "offset",
-                  offsetY,
-                  oriageScrollHeight,
-                  contentSizeHeight
-                );
                 if (offsetY == 0) {
                   // 向上移动
 
@@ -265,12 +263,6 @@ export default class BookContent extends Component {
                   Math.floor(offsetY + oriageScrollHeight) >=
                   Math.floor(contentSizeHeight)
                 ) {
-                  console.log(
-                    "offset",
-                    offsetY,
-                    oriageScrollHeight,
-                    contentSizeHeight
-                  );
 
                   if (this.state.chapterIndex >= this.state.records - 1) {
                     Toast.info("已经阅读完毕！");
@@ -288,7 +280,6 @@ export default class BookContent extends Component {
                       }
                     );
                   } else {
-                    console.log("dddddfff");
                     const { chapterid, chaptername } = this.state.menuList[
                       this.state.chapterIndex + 2 - this.state.start
                     ];
@@ -541,10 +532,10 @@ export default class BookContent extends Component {
                 >
                   <TextInput
                     value={this.state.chapterInputValue}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       this.setState({
                         chapterInputValue: text
-                      })
+                      });
                     }}
                     style={{
                       width: px(120),
@@ -567,14 +558,20 @@ export default class BookContent extends Component {
                       this.setState({
                         showInput: false
                       });
-                       if (this.state.chapterInputValue != null && !isNaN(this.state.chapterInputValue)) {
+                      if (
+                        this.state.chapterInputValue != null &&
+                        !isNaN(this.state.chapterInputValue)
+                      ) {
                         //  alert("test");
-                        this.setState({
-                          chapterIndex: this.state.chapterInputValue
-                        }, () => {
-                          this.requestChapterId()
-                        })
-                       }
+                        this.setState(
+                          {
+                            chapterIndex: this.state.chapterInputValue
+                          },
+                          () => {
+                            this.requestChapterId();
+                          }
+                        );
+                      }
                     }}
                     style={{
                       flex: 1,
@@ -623,17 +620,50 @@ export default class BookContent extends Component {
                     height: px(80),
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "space-evenly",
                     width: "100%"
                   }}
                 >
-                  <TouchableOpacity onPress={() => {
-                    this.setState({
-                      showInput: true,
-                      menuListModal: false
-                    })
-                  }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({
+                        showInput: true,
+                        menuListModal: false
+                      });
+                    }}
+                  >
                     <Text>跳转章节</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (this.state.menuDirection) {
+                        this.setState(
+                          {
+                            menuDirection: false,
+                            chapterIndex: 0,
+                            start: this.state.records,
+                            menuList: []
+                          },
+                          () => {
+                            this.requestHeadMenuList();
+                          }
+                        );
+                      } else {
+                        this.setState(
+                          {
+                            menuDirection: true,
+                            chapterIndex: this.state.records - 1,
+                            start: 0,
+                            menuList: []
+                          },
+                          () => {
+                            this.requestHeadMenuList();
+                          }
+                        );
+                      }
+                    }}
+                  >
+                    <Text>章节倒序</Text>
                   </TouchableOpacity>
                 </View>
                 {
@@ -647,13 +677,26 @@ export default class BookContent extends Component {
                       this.flatList = view;
                     }}
                     initialScrollIndex={
-                      this.state.chapterIndex - this.state.start + 1
+                      menuIndex
+                      //  () > 0 ? (this.state.chapterIndex - this.state.start + 1): 0
+                      // 0
                     }
-                    getItemLayout={(data, index) => ({
-                      length: px(100),
-                      offset: px(75) * index,
-                      index
-                    })}
+                    getItemLayout={(data, index) => {
+                      if (this.state.menuDirection) {
+                        return {
+                          length: px(100),
+                          offset: px(75) * index,
+                          index
+                        };
+                      } else {
+                        return {
+                          length: px(100),
+                          offset: px(75) * index,
+                          index
+                        };
+                      }
+                      
+                    }}
                     ListFooterComponent={<FooterView />}
                     data={this.state.menuList}
                     onEndReached={this.requestBottomMenuList.bind(this)}
@@ -669,7 +712,6 @@ export default class BookContent extends Component {
                               chaptername,
                               chapterorder
                             } = item;
-                            console.log("item", item, chapterid);
                             this.setState(
                               {
                                 chapterIndex: chapterorder - 1,
@@ -680,7 +722,6 @@ export default class BookContent extends Component {
                                 showHeadAd: true
                               },
                               () => {
-                                console.log("updateBookDetailList");
                                 this.scrollToTopView();
                                 this.requestBookContent(true);
                                 this.updateBookDetailList();
@@ -693,11 +734,16 @@ export default class BookContent extends Component {
                             style={[
                               styles.chapterName,
                               {
-                                color:
-                                  index ==
-                                  this.state.chapterIndex - this.state.start + 1
+                                color: this.state.menuDirection
+                                  ? index ==
+                                    this.state.chapterIndex -
+                                      this.state.start +
+                                      1
                                     ? "red"
-                                    : "#656E79",
+                                    : "#656e79"
+                                  : index == this.state.records - this.state.chapterIndex - 1
+                                  ? "red"
+                                  : "#656e79",
                                 fontWeight:
                                   index ===
                                   this.state.chapterIndex - this.state.start + 1
@@ -1127,6 +1173,7 @@ export default class BookContent extends Component {
       pageIndex: pageIndex,
       pageSize: 10,
       articleid: this.state.articleid,
+      sort: this.state.menuDirection ? 'asc': 'desc',
       callback: this.requestMenuListCallback.bind(this)
     }
     getMenuList(data)
@@ -1140,6 +1187,7 @@ export default class BookContent extends Component {
         pageIndex: 1,
         pageSize: records,
         articleid: this.state.articleid,
+        sort: this.state.menuDirection ? 'asc': 'desc',
         callback: this.requestFullMenuListCallback.bind(this)
       }
       getMenuList(requestData);
@@ -1148,19 +1196,46 @@ export default class BookContent extends Component {
 
   requestHeadMenuList() {
 
-    const { start } = this.state;
+    if (this.state.menuDirection) {
+      // 正序
+      const { start } = this.state;
 
-    if (start > 10) {
-      const pageIndex = Math.floor((start - 10) / 10) + 1
+      if (start > 10) {
+        const pageIndex = Math.floor((start - 10) / 10) + 1;
 
+        const requestData = {
+          pageIndex: pageIndex,
+          pageSize: 10,
+          articleid: this.state.articleid,
+          sort: this.state.menuDirection ? "asc" : "desc",
+          callback: this.requestHeadMenuListCallback.bind(this)
+        };
+        getMenuList(requestData);
+      } else {
+        const pageIndex = 1;
+        const requestData = {
+          pageIndex: pageIndex,
+          pageSize: 10,
+          articleid: this.state.articleid,
+          sort: this.state.menuDirection ? "asc" : "desc",
+          callback: this.requestHeadMenuListCallback.bind(this)
+        };
+        getMenuList(requestData);
+      }
+    } else {
+      // 倒叙
+      const pageIndex = Math.floor((this.state.records - this.state.start) / 10) + 1;
       const requestData = {
         pageIndex: pageIndex,
         pageSize: 10,
         articleid: this.state.articleid,
+        sort: this.state.menuDirection ? "asc" : "desc",
         callback: this.requestHeadMenuListCallback.bind(this)
-      }
-      getMenuList(requestData)
+      };
+      getMenuList(requestData);
     }
+
+    
 
   }
 
@@ -1170,44 +1245,83 @@ export default class BookContent extends Component {
       this.setState({
           menuList: [...data, ...this.state.menuList],
           start: data[0].chapterorder,
+          end: this.state.menuList.length == 0? data[data.length - 1].chapterorder: this.state.menuList[this.state.menuList.length - 1].chapterorder
       }, () => {
           if (this.state.willReload) {
-            const item = this.state.menuList[this.state.chapterIndex - this.state.start + 1];
-            const { chaptername, chapterid } = item;
-            this.setState(
-              {
-                chapterName: chaptername,
-                chapterid: chapterid,
-                willReload: false,
-              },
-              () => {
-                this.updateBookDetailList();
-                this.requestBookContent(true);
-                this.scrollToTopView();
-              }
-            );
+            if (this.state.menuDirection) {
+              const item = this.state.menuList[
+                this.state.chapterIndex - this.state.start + 1
+              ];
+              const { chaptername, chapterid } = item;
+              this.setState(
+                {
+                  chapterName: chaptername,
+                  chapterid: chapterid,
+                  willReload: false
+                },
+                () => {
+                  this.updateBookDetailList();
+                  this.requestBookContent(true);
+                  this.scrollToTopView();
+                }
+              );
+            } else {
+              const item = this.state.menuList[
+                this.state.chapterIndex -
+                  (this.state.records - this.state.start) +
+                  1
+              ];
+              const { chaptername, chapterid} = item;
+              this.setState(
+                {
+                  chapterName: chaptername,
+                  chapterid: chapterid,
+                  willReload: false
+                },
+                () => {
+                  this.updateBookDetailList();
+                  this.requestBookContent(true);
+                  // this.scrollToTopView();
+                }
+              );
+            }
+            
           }
       })
     }
   }
 
   requestBottomMenuList() {
-    console.log('requestBottomMenuList', this.state)
 
     const { end, records } = this.state;
 
-    if (end < records) {
+    if (this.state.menuDirection) {
+      if (end < records) {
         const pageIndex = Math.floor(end / 10) + 1;
 
         const requestData = {
           pageIndex: pageIndex,
           pageSize: 10,
           articleid: this.state.articleid,
+          sort: this.state.menuDirection ? "asc" : "desc",
           callback: this.requestBottomMenuListCallback.bind(this)
-        }
+        };
         getMenuList(requestData);
+      } else {
+        return;
+      }
     } else {
-      return;
+      if (end > 0) {
+        const pageIndex = Math.floor(((this.state.records - end) + 1) / 10) + 1;
+        const requestData = {
+          pageIndex: pageIndex,
+          pageSize: 10,
+          articleid: this.state.articleid,
+          sort: this.state.menuDirection ? "asc" : "desc",
+          callback: this.requestBottomMenuListCallback.bind(this)
+        };
+        getMenuList(requestData);
+      }
     }
   }
 
@@ -1221,40 +1335,68 @@ export default class BookContent extends Component {
       }, () => {
 
         if (this.state.willReload) {
-          const item = this.state.menuList[this.state.chapterIndex - this.state.start + 1];
-          const { chaptername, chapterid } = item;
 
-          this.setState({
-            chapterName: chaptername,
-            chapterid: chapterid,
-            willReload: false,
-          }, () => {
-            this.updateBookDetailList()
-            this.requestBookContent(true)
-            this.scrollToTopView()
-          })
+          if (!this.state.menuDirection) {
+            const item = this.state.menuList[
+              this.state.chapterIndex - (this.state.records - this.state.start) + 1
+            ];
+            const { chaptername, chapterid } = item;
+
+            this.setState(
+              {
+                chapterName: chaptername,
+                chapterid: chapterid,
+                willReload: false
+              },
+              () => {
+                this.updateBookDetailList();
+                this.requestBookContent(true);
+                this.scrollToTopView();
+              }
+            );
+          } else {
+            const item = this.state.menuList[
+              this.state.chapterIndex -
+                this.state.start +
+                1
+            ];
+            const { chaptername, chapterid } = item;
+
+            this.setState(
+              {
+                chapterName: chaptername,
+                chapterid: chapterid,
+                willReload: false
+              },
+              () => {
+                this.updateBookDetailList();
+                this.requestBookContent(true);
+                this.scrollToTopView();
+              }
+            );
+          }
+
+          
         }
       })
     }
   }
 
   requestChapterId() {
-    console.log('requestChapterId')
     const pageIndex = Math.floor(this.state.chapterIndex / 10) + 1;
     const data = {
       pageIndex: pageIndex,
       pageSize: 10,
       articleid: this.state.articleid,
+      sort: this.state.menuDirection ? 'asc': 'desc',
       callback: this.requestChapterIdCallback.bind(this)
     }
     getMenuList(data)
   }
 
   requestChapterIdCallback(res) {
-    console.log('res', res)
     const { data, state, page } = res;
     if (state == 1) {
-      console.log('data', this.state.chapterIndex % 10, data[this.state.chapterIndex % 10])
       const { chapterid = null, chaptername = "" } = data[this.state.chapterIndex % 10];
 
       const { start, end } = this.state;
@@ -1320,7 +1462,6 @@ export default class BookContent extends Component {
 
   requestHeadAdCallback(res) {
     const { state, data } = res;
-    console.log('requestHeadAd', data)
     if (state == 1) {
       this.setState({
         headUrl: data.Url,

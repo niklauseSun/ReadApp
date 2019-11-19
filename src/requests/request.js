@@ -25,8 +25,8 @@ const getBookDetail = ({articleid, callback = null}) => {
   getRequest(`Api/Article/Detail/${articleid}`, callback);
 }
 
-const getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null}) => {
-  getRequest(`Api/Article/Chapters/${articleid}?pageIndex=${pageIndex}&pageSize=${pageSize}`, callback);
+const getMenuList = ({articleid, pageIndex = 1, pageSize = 10, callback = null, sort = 'asc'}) => {
+  getRequest(`Api/Article/Chapters/${articleid}?pageIndex=${pageIndex}&pageSize=${pageSize}&sort=${sort}`, callback);
 }
 
 const getBookContent = ({articleid, chapterid, callback = null }) => {
