@@ -31,7 +31,7 @@ export default class BookContent extends Component {
       articleid: articleid,
       chapterid: null,
       chapterIndex: chapterIndex,
-      charterList: null,
+      fullMenuList: null,
       bottomModal: false,
       menuListModal: false,
       setModal:false,
@@ -82,13 +82,11 @@ export default class BookContent extends Component {
       Hud.show()
     })
     this.getBrightAction()
-    // this.requestBookContent()
-    // this.requestLocalMenuList()
-    // this.requestMenuList()
     this.requestChapterId();
     this.requestHeadAd()
     this.requestBottomAd()
     this.getLocalConfig()
+    this.requestLocalMenuList()
   }
 
   componentWillUnmount() {
@@ -114,12 +112,13 @@ export default class BookContent extends Component {
     const htmlContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.headUrl}"></script></html>`
     const htmlBottomContent = `<html><script type="text/javascript" charset="utf-8" src="${this.state.bottomUrl}"></script></html>`
 
-    const menuIndex = this.state.menuDirection
-      ? this.state.chapterIndex - this.state.start + 1 < 0
-        ? 0
-        : this.state.chapterIndex - this.state.start + 1
-      : this.state.records - this.state.chapterIndex - 1;
-    // const menuIndex = 0;
+    let showMenuList = this.state.fullMenuList === null ? null : [...this.state.fullMenuList];
+    if (!this.state.menuDirection) {
+      if (showMenuList != null) {
+        showMenuList.reverse();
+      }
+    }
+
     return (
       <View
         style={[
@@ -149,9 +148,6 @@ export default class BookContent extends Component {
                 />
               ) : this.state.headUrl == null ? null : (
                 <WebView
-                  // style={{
-                  //   backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
-                  // }}
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
@@ -220,68 +216,37 @@ export default class BookContent extends Component {
                 var oriageScrollHeight = e.nativeEvent.layoutMeasurement.height; //scrollView高度
                 if (offsetY == 0) {
                   // 向上移动
-
-                  // if (!this.loadFirst) {
-                  //   return;
-                  // }
                   if (this.state.chapterIndex == 0) {
-                    // this.loadFirst = false;
                     return;
                   }
-                  if (this.state.chapterIndex <= this.state.start - 1) {
-                    this.setState(
-                      {
-                        chapterIndex: this.state.chapterIndex - 1,
-                        willReload: true
-                      },
-                      () => {
-                        this.requestHeadMenuList();
-                      }
-                    );
-                  } else {
-                    const { chapterid, chaptername } = this.state.menuList[
-                      this.state.chapterIndex - this.state.start
-                    ];
-                    this.setState(
-                      {
-                        chapterid: chapterid,
-                        chapterName: chaptername,
-                        chapterIndex: this.state.chapterIndex - 1,
-                        showBottomAd: true,
-                        showHeadAd: true
-                      },
-                      () => {
-                        this.updateBookDetailList();
-                        this.requestBookContent(true);
-                        this.scrollToTopView();
-                      }
-                    );
+
+                  if (this.state.fullMenuList == null) {
+                    return;
                   }
-                  // this.loadFirst = false;
+
+                  const { chapterid, chaptername } = this.state.fullMenuList[this.state.chapterIndex - 1];
+                  this.setState({
+                    chapterid: chapterid,
+                    chaptername: chaptername,
+                    chapterIndex: this.state.chapterIndex - 1,
+                    showBottomAd: true,
+                    showHeadAd: true
+                  }, () => {
+                    this.updateBookDetailList();
+                    this.requestBookContent(true);
+                    this.scrollToTopView();
+                  })
                 }
                 if (
                   Math.floor(offsetY + oriageScrollHeight) >=
                   Math.floor(contentSizeHeight)
                 ) {
-
                   if (this.state.chapterIndex >= this.state.records - 1) {
                     Toast.info("已经阅读完毕！");
                     return;
                   }
-
-                  if (this.state.chapterIndex + 1 >= this.state.end - 1) {
-                    this.setState(
-                      {
-                        chapterIndex: this.state.chapterIndex + 1,
-                        willReload: true
-                      },
-                      () => {
-                        this.requestBottomMenuList();
-                      }
-                    );
-                  } else {
                     const { chapterid, chaptername } = this.state.menuList[
-                      this.state.chapterIndex + 2 - this.state.start
+                      this.state.chapterIndex + 1
                     ];
                     this.setState(
                       {
@@ -295,12 +260,9 @@ export default class BookContent extends Component {
                         this.updateBookDetailList();
                         this.requestBookContent(true);
                         this.scrollToTopView();
-                        // this.loadNext = false;
                       }
                     );
                   }
-                  // this.loadNext = false;
-                }
               }}
               style={{
                 flex: 1,
@@ -349,9 +311,6 @@ export default class BookContent extends Component {
                 />
               ) : this.state.bottomUrl == null ? null : (
                 <WebView
-                  // style={{
-                  //     backgroundColor: this.state.readMode ? this.dayMode : this.nightMode
-                  // }}
                   thirdPartyCookiesEnabled={true}
                   sharedCookiesEnabled={true}
                   source={{ html: androidContent }}
@@ -568,7 +527,27 @@ export default class BookContent extends Component {
                             chapterIndex: this.state.chapterInputValue
                           },
                           () => {
-                            this.requestChapterId();
+                            // this.requestChapterId();
+                            const {
+                              chapterid,
+                              chaptername,
+                              chapterorder
+                            } = this.state.fullMenuList[this.state.chapterIndex];
+                            this.setState(
+                              {
+                                chapterIndex: chapterorder - 1,
+                                chapterid: chapterid,
+                                menuListModal: false,
+                                chapterName: chaptername,
+                                showBottomAd: true,
+                                showHeadAd: true
+                              },
+                              () => {
+                                this.scrollToTopView();
+                                this.requestBookContent(true);
+                                this.updateBookDetailList();
+                              }
+                            );
                           }
                         );
                       }
@@ -636,31 +615,9 @@ export default class BookContent extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      if (this.state.menuDirection) {
-                        this.setState(
-                          {
-                            menuDirection: false,
-                            chapterIndex: 0,
-                            start: this.state.records,
-                            menuList: []
-                          },
-                          () => {
-                            this.requestHeadMenuList();
-                          }
-                        );
-                      } else {
-                        this.setState(
-                          {
-                            menuDirection: true,
-                            chapterIndex: this.state.records - 1,
-                            start: 0,
-                            menuList: []
-                          },
-                          () => {
-                            this.requestHeadMenuList();
-                          }
-                        );
-                      }
+                     this.setState({
+                       menuDirection: !this.state.menuDirection
+                     })
                     }}
                   >
                     <Text>章节倒序</Text>
@@ -676,33 +633,20 @@ export default class BookContent extends Component {
                     ref={view => {
                       this.flatList = view;
                     }}
+                    extraData={this.state.menuDirection}
                     initialScrollIndex={
-                      menuIndex
-                      //  () > 0 ? (this.state.chapterIndex - this.state.start + 1): 0
-                      // 0
+                      this.state.menuDirection ? this.state.chapterIndex: 0
                     }
                     getItemLayout={(data, index) => {
-                      if (this.state.menuDirection) {
-                        return {
-                          length: px(100),
-                          offset: px(75) * index,
-                          index
-                        };
-                      } else {
-                        return {
-                          length: px(100),
-                          offset: px(75) * index,
-                          index
-                        };
-                      }
-                      
+                      return {
+                        length: px(100),
+                        offset: px(75) * index,
+                        index
+                      };
                     }}
                     ListFooterComponent={<FooterView />}
-                    data={this.state.menuList}
-                    onEndReached={this.requestBottomMenuList.bind(this)}
-                    onEndReachedThreshold={0.1}
+                    data={showMenuList}
                     refreshing={this.state.refresh}
-                    onRefresh={this.requestHeadMenuList.bind(this)}
                     renderItem={({ item, index }) => {
                       return (
                         <TouchableOpacity
@@ -735,20 +679,19 @@ export default class BookContent extends Component {
                               styles.chapterName,
                               {
                                 color: this.state.menuDirection
-                                  ? index ==
-                                    this.state.chapterIndex -
-                                      this.state.start +
-                                      1
+                                  ? item.chaptername === this.state.chapterName
                                     ? "red"
                                     : "#656e79"
-                                  : index == this.state.records - this.state.chapterIndex - 1
+                                  : item.chaptername === this.state.chapterName
                                   ? "red"
                                   : "#656e79",
-                                fontWeight:
-                                  index ===
-                                  this.state.chapterIndex - this.state.start + 1
+                                fontWeight: this.state.menuDirection
+                                  ? item.chaptername === this.state.chapterName
                                     ? "bold"
                                     : "normal"
+                                  : item.chaptername === this.state.chapterName
+                                  ? "bold"
+                                  : "normal"
                               }
                             ]}
                           >
@@ -1234,9 +1177,6 @@ export default class BookContent extends Component {
       };
       getMenuList(requestData);
     }
-
-    
-
   }
 
   requestHeadMenuListCallback( res) {
@@ -1321,6 +1261,16 @@ export default class BookContent extends Component {
           callback: this.requestBottomMenuListCallback.bind(this)
         };
         getMenuList(requestData);
+      } else {
+        const pageIndex = 1;
+        const requestData = {
+          pageIndex: pageIndex,
+          pageSize: 10,
+          articleid: this.state.articleid,
+          sort: this.state.menuDirection ? "asc" : "desc",
+          callback: this.requestBottomMenuListCallback.bind(this)
+        };
+        getMenuList(requestData);
       }
     }
   }
@@ -1383,7 +1333,7 @@ export default class BookContent extends Component {
   }
 
   requestChapterId() {
-    const pageIndex = Math.floor(this.state.chapterIndex / 10) + 1;
+    let pageIndex = Math.floor(this.state.chapterIndex / 10) + 1;
     const data = {
       pageIndex: pageIndex,
       pageSize: 10,
@@ -1407,6 +1357,8 @@ export default class BookContent extends Component {
             end:data[data.length -1].chapterorder,
             menuList:data,
             records: records,
+        }, () => {
+          this.requestFullMenuList();
         })
       }
       if (chapterid != null) {
@@ -1420,12 +1372,26 @@ export default class BookContent extends Component {
     }
   }
 
+  requestFullMenuList() {
+    const pageIndex = 1;
+    const pageSize = this.state.records;
+    const data = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+      articleid: this.state.articleid,
+      callback: this.requestFullMenuListCallback.bind(this)
+    };
+    getMenuList(data)
+  }
+
   requestFullMenuListCallback(res) {
     const { data, state } = res;
     if (state == 1) {
       this.setState({
-        charterList: data,
+        fullMenuList: data,
       })
+
+      console.log('getRemoteMenu');
 
       saveLocalMenuList({
         articleid: this.state.articleid,
@@ -1445,9 +1411,10 @@ export default class BookContent extends Component {
 
   requestLocalMenuListCallback(res) {
     const { error, data } = res;
+    console.log('getLocal menu')
     if (error == null) {
       this.setState({
-        charterList: data,
+        fullMenuList: data,
       })
     }
   }
