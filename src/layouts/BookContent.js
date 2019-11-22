@@ -224,18 +224,23 @@ export default class BookContent extends Component {
                     return;
                   }
 
-                  const { chapterid, chaptername } = this.state.fullMenuList[this.state.chapterIndex - 1];
-                  this.setState({
-                    chapterid: chapterid,
-                    chaptername: chaptername,
-                    chapterIndex: this.state.chapterIndex - 1,
-                    showBottomAd: true,
-                    showHeadAd: true
-                  }, () => {
-                    this.updateBookDetailList();
-                    this.requestBookContent(true);
-                    this.scrollToTopView();
-                  })
+                  const { chapterid, chaptername } = this.state.fullMenuList[
+                    this.state.chapterIndex - 1
+                  ];
+                  this.setState(
+                    {
+                      chapterid: chapterid,
+                      chaptername: chaptername,
+                      chapterIndex: this.state.chapterIndex - 1,
+                      showBottomAd: true,
+                      showHeadAd: true
+                    },
+                    () => {
+                      this.updateBookDetailList();
+                      this.requestBookContent(true);
+                      this.scrollToTopView();
+                    }
+                  );
                 }
                 if (
                   Math.floor(offsetY + oriageScrollHeight) >=
@@ -245,24 +250,24 @@ export default class BookContent extends Component {
                     Toast.info("已经阅读完毕！");
                     return;
                   }
-                    const { chapterid, chaptername } = this.state.menuList[
-                      this.state.chapterIndex + 1
-                    ];
-                    this.setState(
-                      {
-                        chapterid: chapterid,
-                        chapterName: chaptername,
-                        chapterIndex: this.state.chapterIndex + 1,
-                        showBottomAd: true,
-                        showHeadAd: true
-                      },
-                      () => {
-                        this.updateBookDetailList();
-                        this.requestBookContent(true);
-                        this.scrollToTopView();
-                      }
-                    );
-                  }
+                  const { chapterid, chaptername } = this.state.fullMenuList[
+                    this.state.chapterIndex + 1
+                  ];
+                  this.setState(
+                    {
+                      chapterid: chapterid,
+                      chapterName: chaptername,
+                      chapterIndex: this.state.chapterIndex + 1,
+                      showBottomAd: true,
+                      showHeadAd: true
+                    },
+                    () => {
+                      this.updateBookDetailList();
+                      this.requestBookContent(true);
+                      this.scrollToTopView();
+                    }
+                  );
+                }
               }}
               style={{
                 flex: 1,
@@ -472,7 +477,7 @@ export default class BookContent extends Component {
                 }}
                 style={{
                   width: px(400),
-                  height: px(280),
+                  height: Platform.OS === 'ios'? px(280): px(360),
                   backgroundColor: "#fff",
                   alignItems: "center",
                   borderRadius: px(20)
@@ -496,13 +501,10 @@ export default class BookContent extends Component {
                         chapterInputValue: text
                       });
                     }}
-                    style={{
-                      width: px(120),
-                      height: px(50),
-                      borderColor: "gray",
-                      borderWidth: px(1),
-                      borderRadius: px(10)
-                    }}
+                    placeholder="请输入章节"
+                    underlineColorAndroid={"gray"}
+                    style={{ width: px(160) }}
+                    keyboardType="phone-pad"
                   />
                   <Text> / {this.state.records}</Text>
                 </View>
@@ -532,7 +534,9 @@ export default class BookContent extends Component {
                               chapterid,
                               chaptername,
                               chapterorder
-                            } = this.state.fullMenuList[this.state.chapterIndex];
+                            } = this.state.fullMenuList[
+                              this.state.chapterIndex
+                            ];
                             this.setState(
                               {
                                 chapterIndex: chapterorder - 1,
@@ -615,9 +619,9 @@ export default class BookContent extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                     this.setState({
-                       menuDirection: !this.state.menuDirection
-                     })
+                      this.setState({
+                        menuDirection: !this.state.menuDirection
+                      });
                     }}
                   >
                     <Text>章节倒序</Text>
@@ -635,7 +639,7 @@ export default class BookContent extends Component {
                     }}
                     extraData={this.state.menuDirection}
                     initialScrollIndex={
-                      this.state.menuDirection ? this.state.chapterIndex: 0
+                      this.state.menuDirection ? this.state.chapterIndex : 0
                     }
                     getItemLayout={(data, index) => {
                       return {
