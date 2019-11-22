@@ -227,10 +227,12 @@ export default class BookContent extends Component {
                   const { chapterid, chaptername } = this.state.fullMenuList[
                     this.state.chapterIndex - 1
                   ];
+
+                  console.log('up', chapterid, chaptername);
                   this.setState(
                     {
                       chapterid: chapterid,
-                      chaptername: chaptername,
+                      chapterName: chaptername,
                       chapterIndex: this.state.chapterIndex - 1,
                       showBottomAd: true,
                       showHeadAd: true
